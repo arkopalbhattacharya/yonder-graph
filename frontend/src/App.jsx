@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
 import CopilotChat from './components/CopilotChat';
 import GraphVisualizer from './components/GraphVisualizer';
@@ -8,13 +8,28 @@ import GovernanceViewer from './components/GovernanceViewer';
 import { PanelLeftOpen } from 'lucide-react';
 import { api } from './services/api';
 import { useSettings } from './context/SettingsContext';
+import { parseCurrentUrl, syncUrl } from './utils/navigation';
 
 export default function App() {
   const { enableAskMode } = useSettings();
-  const [activeTab, setActiveTab] = useState(() => enableAskMode ? 'ask' : 'resolve');
+
+  // Initial state derived directly from current URL
+  const [activeTab, setActiveTab] = useState(() => {
+    const { tab } = parseCurrentUrl();
+    if (tab) {
+      if (tab === 'ask' && !enableAskMode) return 'resolve';
+      return tab;
+    }
+    return enableAskMode ? 'ask' : 'resolve';
+  });
+
+  const [activeSessionId, setActiveSessionId] = useState(() => {
+    const { sessionId } = parseCurrentUrl();
+    return sessionId || crypto.randomUUID();
+  });
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [sessions, setSessions] = useState([]);
-  const [activeSessionId, setActiveSessionId] = useState(() => crypto.randomUUID());
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fetchSessions = async () => {
@@ -30,32 +45,83 @@ export default function App() {
     fetchSessions();
   }, [refreshTrigger]);
 
+  // Sync initial URL on mount if at root '/' or '/chat/:sessionId'
+  useEffect(() => {
+    const { tab, sessionId } = parseCurrentUrl();
+    
+    // If user hit /chat/:sessionId or /session/:sessionId without persona prefix
+    if (!tab && sessionId) {
+      api.getChatSession(sessionId)
+        .then(data => {
+          const persona = (data?.persona === 'ask' && enableAskMode) ? 'ask' : 'resolve';
+          setActiveTab(persona);
+          setActiveSessionId(sessionId);
+          syncUrl(persona, sessionId, true);
+        })
+        .catch(() => {
+          const fallback = enableAskMode ? 'ask' : 'resolve';
+          setActiveTab(fallback);
+          setActiveSessionId(sessionId);
+          syncUrl(fallback, sessionId, true);
+        });
+      return;
+    }
+
+    if (!tab) {
+      const defaultTab = enableAskMode ? 'ask' : 'resolve';
+      syncUrl(defaultTab, null, true);
+    }
+  }, [enableAskMode]);
+
+  // Browser Back / Forward navigation listener
+  useEffect(() => {
+    const handlePopState = () => {
+      const { tab, sessionId } = parseCurrentUrl();
+      if (tab) {
+        setActiveTab(tab === 'ask' && !enableAskMode ? 'resolve' : tab);
+      }
+      if (sessionId) {
+        setActiveSessionId(sessionId);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [enableAskMode]);
+
   // If ask mode gets disabled and user is currently on 'ask' tab, auto-switch to 'resolve'
   useEffect(() => {
     if (!enableAskMode && activeTab === 'ask') {
       setActiveTab('resolve');
+      syncUrl('resolve', activeSessionId);
     }
-  }, [enableAskMode, activeTab]);
+  }, [enableAskMode, activeTab, activeSessionId]);
 
-  const handleSelectSession = (sessionId) => {
+  const handleTabChange = useCallback((newTab) => {
+    setActiveTab(newTab);
+    const isChat = newTab === 'ask' || newTab === 'resolve';
+    syncUrl(newTab, isChat ? activeSessionId : null);
+  }, [activeSessionId]);
+
+  const handleSelectSession = useCallback((sessionId) => {
     setActiveSessionId(sessionId);
     const sessionObj = sessions.find(s => s.session_id === sessionId);
+    let targetPersona = activeTab === 'ask' || activeTab === 'resolve' ? activeTab : (enableAskMode ? 'ask' : 'resolve');
+    
     if (sessionObj && (sessionObj.persona === 'ask' || sessionObj.persona === 'resolve')) {
-      if (sessionObj.persona === 'ask' && !enableAskMode) {
-        setActiveTab('resolve');
-      } else {
-        setActiveTab(sessionObj.persona);
-      }
+      targetPersona = (sessionObj.persona === 'ask' && !enableAskMode) ? 'resolve' : sessionObj.persona;
     }
-  };
+    setActiveTab(targetPersona);
+    syncUrl(targetPersona, sessionId);
+  }, [sessions, activeTab, enableAskMode]);
 
-  const handleNewChat = () => {
+  const handleNewChat = useCallback(() => {
     const newId = crypto.randomUUID();
     setActiveSessionId(newId);
-    if (activeTab !== 'ask' && activeTab !== 'resolve') {
-      setActiveTab(enableAskMode ? 'ask' : 'resolve');
-    }
-  };
+    const targetTab = (activeTab === 'ask' || activeTab === 'resolve') ? activeTab : (enableAskMode ? 'ask' : 'resolve');
+    setActiveTab(targetTab);
+    syncUrl(targetTab, newId);
+  }, [activeTab, enableAskMode]);
 
   const handleTogglePin = async (sessionId, currentPinned, e) => {
     e.stopPropagation();
@@ -86,7 +152,7 @@ export default function App() {
       {/* ── Unified Left Pane ── */}
       <Sidebar 
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
         sessions={sessions}

@@ -27,6 +27,7 @@ import InvestigationStepper from './InvestigationStepper';
 import EnrichmentAgentModal from './EnrichmentAgentModal';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { syncUrl } from '../utils/navigation';
 
 const RESOLVE_HIERARCHY_STEPS = [
   {
@@ -250,6 +251,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
   const handleSwitchPersona = (newPersona) => {
     if (newPersona === persona) return;
     setPersona(newPersona);
+    syncUrl(newPersona, messages.length > 0 ? activeSessionId : null);
     if (messages.length === 0) {
       // stay on clean splash
     } else {
@@ -275,6 +277,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    syncUrl(persona, activeSessionId);
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -289,6 +292,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
         userQuery: queryToSend,
         feedbackStatus: null
       };
+      syncUrl(persona, activeSessionId);
       
       // Accumulate tokens for the current session in localStorage
       try {
