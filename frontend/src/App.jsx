@@ -5,19 +5,22 @@ import GraphVisualizer from './components/GraphVisualizer';
 import AgentDashboard from './components/AgentDashboard';
 import KnowledgeStudio from './components/KnowledgeStudio';
 import GovernanceViewer from './components/GovernanceViewer';
+import SentinelView from './components/SentinelView';
+import MetricsDashboard from './components/MetricsDashboard';
 import { PanelLeftOpen } from 'lucide-react';
 import { api } from './services/api';
 import { useSettings } from './context/SettingsContext';
 import { parseCurrentUrl, syncUrl } from './utils/navigation';
 
 export default function App() {
-  const { enableAskMode } = useSettings();
+  const { enableAskMode, enableSentinel } = useSettings();
 
   // Initial state derived directly from current URL
   const [activeTab, setActiveTab] = useState(() => {
     const { tab } = parseCurrentUrl();
     if (tab) {
       if (tab === 'ask' && !enableAskMode) return 'resolve';
+      if (tab === 'sentinel' && !enableSentinel) return 'resolve';
       return tab;
     }
     return enableAskMode ? 'ask' : 'resolve';
@@ -73,12 +76,32 @@ export default function App() {
     }
   }, [enableAskMode]);
 
+  useEffect(() => {
+    if (!enableAskMode && activeTab === 'ask') {
+      setActiveTab('resolve');
+      syncUrl('resolve', activeSessionId, true);
+    }
+  }, [enableAskMode, activeTab, activeSessionId]);
+
+  useEffect(() => {
+    if (!enableSentinel && activeTab === 'sentinel') {
+      setActiveTab('resolve');
+      syncUrl('resolve', activeSessionId, true);
+    }
+  }, [enableSentinel, activeTab, activeSessionId]);
+
   // Browser Back / Forward navigation listener
   useEffect(() => {
     const handlePopState = () => {
       const { tab, sessionId } = parseCurrentUrl();
       if (tab) {
-        setActiveTab(tab === 'ask' && !enableAskMode ? 'resolve' : tab);
+        if (tab === 'ask' && !enableAskMode) {
+          setActiveTab('resolve');
+        } else if (tab === 'sentinel' && !enableSentinel) {
+          setActiveTab('resolve');
+        } else {
+          setActiveTab(tab);
+        }
       }
       if (sessionId) {
         setActiveSessionId(sessionId);
@@ -87,15 +110,7 @@ export default function App() {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [enableAskMode]);
-
-  // If ask mode gets disabled and user is currently on 'ask' tab, auto-switch to 'resolve'
-  useEffect(() => {
-    if (!enableAskMode && activeTab === 'ask') {
-      setActiveTab('resolve');
-      syncUrl('resolve', activeSessionId);
-    }
-  }, [enableAskMode, activeTab, activeSessionId]);
+  }, [enableAskMode, enableSentinel]);
 
   const handleTabChange = useCallback((newTab) => {
     setActiveTab(newTab);
@@ -199,6 +214,18 @@ export default function App() {
             />
           </div>
 
+          {/* Predictive Sentinel Tab (Experimental) */}
+          {enableSentinel && (
+            <div className={`absolute inset-0 transition-opacity duration-200 ${activeTab === 'sentinel' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
+              <SentinelView 
+                isActive={activeTab === 'sentinel'} 
+                onNavigateToSession={(sessionId, persona) => {
+                  handleSessionSelect(sessionId, persona);
+                }}
+              />
+            </div>
+          )}
+
           {/* Knowledge Graph Tab */}
           <div className={`absolute inset-0 transition-opacity duration-200 ${activeTab === 'graph' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
             <GraphVisualizer isActive={activeTab === 'graph'} />
@@ -217,6 +244,11 @@ export default function App() {
           {/* Governance Tab */}
           <div className={`absolute inset-0 transition-opacity duration-200 ${activeTab === 'governance' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
             <GovernanceViewer isActive={activeTab === 'governance'} />
+          </div>
+
+          {/* Metrics & ROI Analytics Tab */}
+          <div className={`absolute inset-0 transition-opacity duration-200 ${activeTab === 'metrics' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
+            <MetricsDashboard isActive={activeTab === 'metrics'} />
           </div>
         </main>
       </div>

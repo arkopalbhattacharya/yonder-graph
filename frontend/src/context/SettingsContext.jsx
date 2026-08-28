@@ -27,6 +27,14 @@ export function SettingsProvider({ children }) {
     return false;
   });
 
+  const [enableSentinel, setEnableSentinel] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('yg-experimental-sentinel');
+      return stored === 'true'; // Default: false (disabled)
+    }
+    return false;
+  });
+
   useEffect(() => {
     localStorage.setItem('yg-experimental-ask', String(enableAskMode));
   }, [enableAskMode]);
@@ -39,9 +47,14 @@ export function SettingsProvider({ children }) {
     localStorage.setItem('yg-experimental-reasoning', String(enableShowReasoning));
   }, [enableShowReasoning]);
 
+  useEffect(() => {
+    localStorage.setItem('yg-experimental-sentinel', String(enableSentinel));
+  }, [enableSentinel]);
+
   const toggleAskMode = () => setEnableAskMode(prev => !prev);
   const toggleFileUpload = () => setEnableFileUpload(prev => !prev);
   const toggleShowReasoning = () => setEnableShowReasoning(prev => !prev);
+  const toggleSentinel = () => setEnableSentinel(prev => !prev);
 
   return (
     <SettingsContext.Provider
@@ -55,6 +68,9 @@ export function SettingsProvider({ children }) {
         enableShowReasoning,
         setEnableShowReasoning,
         toggleShowReasoning,
+        enableSentinel,
+        setEnableSentinel,
+        toggleSentinel,
       }}
     >
       {children}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, ShieldAlert, Cpu, Terminal, CheckCircle2, AlertTriangle, Layers, Wrench, Shield, ArrowDownRight, ArrowUpRight, Zap, Users } from 'lucide-react';
+import { X, ShieldAlert, Cpu, Terminal, CheckCircle2, AlertTriangle, Layers, Wrench, Shield, ArrowDownRight, ArrowUpRight, Zap, Users, Radar } from 'lucide-react';
 import { AGENT_PROFILES } from '../data/agentProfiles';
 
 export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, sessionTokens, onClose }) {
@@ -16,6 +16,8 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
   }, [onClose]);
 
   if (!agentName) return null;
+
+  const isSentinel = agentName === 'SentinelScannerAgent';
 
   const profile = AGENT_PROFILES[agentName] || {
     name: agentName,
@@ -63,8 +65,12 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
         {/* Header */}
         <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/70 dark:bg-[#16161a]/80 backdrop-blur">
           <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 text-blue-600 dark:text-blue-400">
-              <Terminal size={18} />
+            <div className={`p-2 rounded-xl ${
+              isSentinel
+                ? 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 text-rose-600 dark:text-rose-400'
+                : 'bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 text-blue-600 dark:text-blue-400'
+            }`}>
+              {isSentinel ? <Radar size={18} className="animate-pulse" /> : <Terminal size={18} />}
             </div>
             <div>
               <div className="flex items-center space-x-2.5">
