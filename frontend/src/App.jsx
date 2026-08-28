@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
 import CopilotChat from './components/CopilotChat';
 import GraphVisualizer from './components/GraphVisualizer';
 import AgentDashboard from './components/AgentDashboard';
 import KnowledgeStudio from './components/KnowledgeStudio';
 import GovernanceViewer from './components/GovernanceViewer';
+import MetricsDashboard from './components/MetricsDashboard';
 import { PanelLeftOpen } from 'lucide-react';
 import { api } from './services/api';
 import { useSettings } from './context/SettingsContext';
+import { parseCurrentUrl, syncUrl } from './utils/navigation';
 
 export default function App() {
   const { enableAskMode } = useSettings();
@@ -131,6 +133,11 @@ export default function App() {
               sessionId={activeSessionId}
               onSessionUpdated={() => setRefreshTrigger(prev => prev + 1)}
             />
+          </div>
+
+          {/* Metrics & ROI Analytics Tab */}
+          <div className={`absolute inset-0 transition-opacity duration-200 ${activeTab === 'metrics' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
+            <MetricsDashboard isActive={activeTab === 'metrics'} />
           </div>
 
           {/* Knowledge Graph Tab */}

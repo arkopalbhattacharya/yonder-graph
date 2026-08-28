@@ -60,6 +60,7 @@ export const api = {
     return fetchWithHandle(`${API_BASE}/audit/logs?${params.toString()}`);
   },
   getAuditStats: () => fetchWithHandle(`${API_BASE}/audit/stats`),
+  getDashboardMetrics: () => fetchWithHandle(`${API_BASE}/audit/dashboard-metrics`),
   
   // ── Feedback & Corrections ──
   submitFeedback: (payload) => 

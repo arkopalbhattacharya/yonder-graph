@@ -76,6 +76,7 @@ export default function Sidebar({
     { id: 'agents', label: 'agents' },
     { id: 'studio', label: 'studio' },
     { id: 'governance', label: 'governance' },
+    { id: 'metrics', label: 'metrics' },
   ];
 
   const pinnedSessions = sessions.filter(s => s.is_pinned);
