@@ -65,6 +65,11 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
     }
   }, [isActive]);
 
+  const handleFieldChange = (field, val) => {
+    setFormData(prev => ({ ...prev, [field]: val }));
+    setTestResult(null);
+  };
+
   const handleTestConnection = async (e) => {
     e.preventDefault();
     setIsTesting(true);
@@ -224,12 +229,9 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
               <div className="flex items-center space-x-2">
                 <Database size={15} className="text-blue-500" />
                 <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
-                  Connect to Dev Oracle WMS Database
+                  Connect to WMS
                 </span>
               </div>
-              <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                DEV ENVIRONMENT ONLY
-              </span>
             </div>
 
             <form onSubmit={handleConnect} className="space-y-4">
@@ -243,7 +245,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     required
                     placeholder="e.g. oracle-dev.company.corp"
                     value={formData.host}
-                    onChange={e => setFormData({ ...formData, host: e.target.value })}
+                    onChange={e => handleFieldChange('host', e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
                   />
                 </div>
@@ -256,7 +258,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     type="number"
                     required
                     value={formData.port}
-                    onChange={e => setFormData({ ...formData, port: e.target.value })}
+                    onChange={e => handleFieldChange('port', e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
                   />
                 </div>
@@ -272,7 +274,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     required
                     placeholder="e.g. WMSDEV or ORCL"
                     value={formData.service_name}
-                    onChange={e => setFormData({ ...formData, service_name: e.target.value })}
+                    onChange={e => handleFieldChange('service_name', e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
                   />
                 </div>
@@ -285,7 +287,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     type="text"
                     placeholder="e.g. WMSSCHEMA"
                     value={formData.schema_name}
-                    onChange={e => setFormData({ ...formData, schema_name: e.target.value })}
+                    onChange={e => handleFieldChange('schema_name', e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
                   />
                 </div>
@@ -301,7 +303,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     required
                     placeholder="e.g. yonder_sentinel_ro"
                     value={formData.user}
-                    onChange={e => setFormData({ ...formData, user: e.target.value })}
+                    onChange={e => handleFieldChange('user', e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
                   />
                 </div>
@@ -315,7 +317,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     required
                     placeholder="••••••••••••"
                     value={formData.password}
-                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                    onChange={e => handleFieldChange('password', e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
                   />
                 </div>
@@ -354,10 +356,19 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
 
                 <button
                   type="submit"
-                  disabled={isLoading || !formData.host || !formData.service_name || !formData.user || !formData.password}
-                  className="flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                  disabled={!testResult?.success || isLoading || isTesting}
+                  title={
+                    testResult?.success 
+                      ? "Save & Activate Sentinel" 
+                      : "Test Connection must succeed first before saving and activating"
+                  }
+                  className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-xs ${
+                    testResult?.success && !isLoading
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+                      : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed opacity-60'
+                  }`}
                 >
-                  <Radar size={13} />
+                  <Radar size={13} className={testResult?.success ? "animate-pulse text-blue-200" : ""} />
                   <span>{isLoading ? "Connecting..." : "Save & Activate Sentinel"}</span>
                 </button>
               </div>

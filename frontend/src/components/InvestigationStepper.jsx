@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, ShieldCheck, Zap, Copy, Check, Download } from 'lucide-react';
+import { Terminal, ShieldCheck, Copy, Check, Download, WrapText } from 'lucide-react';
 import { api } from '../services/api';
 import CodeCard from './CodeCard';
 
@@ -7,6 +7,7 @@ export default function InvestigationStepper({ steps, sessionId }) {
   const [consolidatedSQL, setConsolidatedSQL] = useState(null);
   const [isConsolidating, setIsConsolidating] = useState(false);
   const [hasCopiedAll, setHasCopiedAll] = useState(false);
+  const [isWordWrap, setIsWordWrap] = useState(false);
 
   if (!steps || steps.length === 0) return null;
 
@@ -44,19 +45,19 @@ export default function InvestigationStepper({ steps, sessionId }) {
 
   return (
     <div className="my-3.5 font-mono">
-      <div className="text-[10px] uppercase tracking-wider text-purple-600 dark:text-purple-400 font-semibold mb-2.5 flex items-center space-x-1.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+      <div className="text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold mb-2.5 flex items-center space-x-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
         <span>Ordered Investigation Steps</span>
       </div>
 
       <div className="relative pl-6 space-y-4">
         {/* Vertical Dotted Connector Line */}
-        <div className="absolute left-2.5 top-3 bottom-3 w-px border-l-2 border-dotted border-purple-400/50 dark:border-purple-500/40 pointer-events-none" />
+        <div className="absolute left-2.5 top-3 bottom-3 w-px border-l-2 border-dotted border-blue-400/50 dark:border-blue-500/40 pointer-events-none" />
 
         {steps.map((step, idx) => (
           <div key={idx} className="relative group">
             {/* Step Number Badge */}
-            <div className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-purple-50 dark:bg-purple-950/80 border border-purple-500/60 text-purple-600 dark:text-purple-400 font-bold text-[10px] shadow-xs z-10">
+            <div className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-blue-50 dark:bg-blue-950/80 border border-blue-500/60 text-blue-600 dark:text-blue-400 font-bold text-[10px] shadow-xs z-10">
               {step.step_number || idx + 1}
             </div>
 
@@ -101,30 +102,41 @@ export default function InvestigationStepper({ steps, sessionId }) {
         ))}
       </div>
 
-      {/* Button to Generate Full Consolidated SQL Script */}
+      {/* Button to Generate SQL Script */}
       {hasAnySQL && (
         <div className="mt-4 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80">
           {!consolidatedSQL ? (
             <button
               onClick={handleConsolidateSQL}
               disabled={isConsolidating}
-              className="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-purple-950/60 dark:hover:bg-purple-900/70 border border-zinc-700 dark:border-purple-800/60 text-white dark:text-purple-200 text-xs font-semibold shadow-xs transition-colors"
+              className="w-full flex items-center justify-center py-2 px-3 rounded-lg bg-blue-50/80 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 border border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-300 text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
             >
-              <Zap size={13} className="text-amber-400" />
-              <span>{isConsolidating ? 'Consolidating SQL Scripts...' : 'Generate Full Consolidated SQL Script'}</span>
+              <span>{isConsolidating ? 'Consolidating SQL Script...' : 'Generate SQL Script'}</span>
             </button>
           ) : (
-            <div className="p-3 bg-zinc-900 dark:bg-[#09090b] border border-purple-900/60 rounded-lg text-white space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-1.5 text-xs text-purple-300 font-semibold">
-                  <Terminal size={13} className="text-purple-400" />
-                  <span>Consolidated Oracle Diagnostic Script</span>
+            <div className="p-3 bg-zinc-900 dark:bg-[#09090b] border border-blue-900/60 rounded-lg text-white space-y-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center space-x-1.5 text-xs text-blue-300 font-semibold truncate">
+                  <Terminal size={13} className="text-blue-400 shrink-0" />
+                  <span className="truncate">Oracle Diagnostic SQL Script</span>
                 </div>
 
-                <div className="flex items-center space-x-1.5">
+                <div className="flex items-center space-x-1.5 shrink-0">
+                  <button
+                    onClick={() => setIsWordWrap(!isWordWrap)}
+                    className={`p-1 rounded text-[10px] flex items-center space-x-1 px-2 transition-colors cursor-pointer ${
+                      isWordWrap
+                        ? 'bg-blue-600/40 text-blue-300 border border-blue-500/50 font-bold'
+                        : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
+                    }`}
+                    title={isWordWrap ? "Disable Text Wrap" : "Enable Text Wrap"}
+                  >
+                    <WrapText size={11} className={isWordWrap ? "text-blue-400" : "text-zinc-400"} />
+                    <span>Wrap</span>
+                  </button>
                   <button
                     onClick={copyConsolidated}
-                    className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] flex items-center space-x-1 px-2"
+                    className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] flex items-center space-x-1 px-2 transition-colors cursor-pointer"
                     title="Copy Script"
                   >
                     {hasCopiedAll ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
@@ -132,7 +144,7 @@ export default function InvestigationStepper({ steps, sessionId }) {
                   </button>
                   <button
                     onClick={downloadConsolidated}
-                    className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] flex items-center space-x-1 px-2"
+                    className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] flex items-center space-x-1 px-2 transition-colors cursor-pointer"
                     title="Download .sql"
                   >
                     <Download size={11} />
@@ -141,7 +153,7 @@ export default function InvestigationStepper({ steps, sessionId }) {
                 </div>
               </div>
 
-              <pre className="p-2.5 bg-black/60 rounded border border-zinc-800 text-[11px] font-mono text-emerald-400 overflow-x-auto custom-scrollbar leading-relaxed">
+              <pre className={`p-2.5 bg-black/60 rounded border border-zinc-800 text-[11px] font-mono text-emerald-400 custom-scrollbar leading-relaxed ${isWordWrap ? 'whitespace-pre-wrap break-words overflow-x-hidden' : 'overflow-x-auto whitespace-pre'}`}>
                 {consolidatedSQL.consolidated_sql}
               </pre>
 

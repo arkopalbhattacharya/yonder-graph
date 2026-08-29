@@ -83,6 +83,12 @@ export const api = {
     
   // ── Governance ──
   getGovernancePolicy: () => fetchWithHandle(`${API_BASE}/governance/policy`),
+  getGovernanceInterceptions: (page = 1, pageSize = 25, filters = {}) => {
+    const params = new URLSearchParams({ page, page_size: pageSize });
+    if (filters.status) params.append('status', filters.status);
+    if (filters.risk_level) params.append('risk_level', filters.risk_level);
+    return fetchWithHandle(`${API_BASE}/governance/interceptions?${params.toString()}`);
+  },
 
   // ── Chat History & Sessions ──
   getChatSessions: () => fetchWithHandle(`${API_BASE}/chat/sessions`),

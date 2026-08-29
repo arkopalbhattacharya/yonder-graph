@@ -75,4 +75,13 @@
   .badge-gray {
     @apply bg-zinc-100 text-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60;
   }
+
+  @keyframes cursorFlicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .cursor-flicker {
+    animation: cursorFlicker 1s step-start infinite;
+  }
 }
