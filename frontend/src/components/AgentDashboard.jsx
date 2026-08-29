@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Activity, Clock, ShieldAlert, Zap, Server, Terminal, Cpu, CheckCircle, AlertTriangle, ArrowDownRight, ArrowUpRight, PowerOff } from 'lucide-react';
+import { Activity, Clock, ShieldAlert, Zap, Server, Terminal, Cpu, CheckCircle, AlertTriangle, ArrowDownRight, ArrowUpRight, PowerOff, Radar } from 'lucide-react';
 import { api } from '../services/api';
 import { useSettings } from '../context/SettingsContext';
 import AgentDetailModal from './AgentDetailModal';
@@ -9,7 +9,7 @@ export default function AgentDashboard({ isActive }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedAgent, setSelectedAgent] = useState(null);
-  const { enableAskMode } = useSettings();
+  const { enableAskMode, enableSentinel } = useSettings();
 
   const [sessionTokens, setSessionTokens] = useState(() => {
     try {
@@ -86,11 +86,17 @@ export default function AgentDashboard({ isActive }) {
     if (!enableAskMode && name === 'AskProcessAgent') {
       return false;
     }
+    if (!enableSentinel && name === 'SentinelScannerAgent') {
+      return false;
+    }
     return true;
   });
 
   const disabledAgents = allEntries.filter(([name]) => {
     if (!enableAskMode && name === 'AskProcessAgent') {
+      return true;
+    }
+    if (!enableSentinel && name === 'SentinelScannerAgent') {
       return true;
     }
     return false;
@@ -184,17 +190,30 @@ export default function AgentDashboard({ isActive }) {
               const totalPrompt = agentMetrics.prompt_tokens || 0;
               const totalCompletion = agentMetrics.completion_tokens || 0;
               const totalTokens = agentMetrics.total_tokens || 0;
+              const isSentinel = name === 'SentinelScannerAgent';
 
               return (
                 <div 
                   key={name} 
-                  className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111114] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors flex flex-col justify-between space-y-3"
+                  className={`p-4 rounded-xl border transition-all flex flex-col justify-between space-y-3 ${
+                    isSentinel
+                      ? 'border-rose-500/40 dark:border-rose-500/40 bg-gradient-to-b from-rose-500/5 via-white/80 to-white/80 dark:via-[#111114]/90 dark:to-[#111114]/90 shadow-xs hover:border-rose-500/70'
+                      : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111114] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700'
+                  }`}
                 >
                   <div>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center space-x-2">
-                        <div className="p-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                          <Terminal size={13} className="text-blue-500" />
+                        <div className={`p-1 rounded-md ${
+                          isSentinel
+                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                        }`}>
+                          {isSentinel ? (
+                            <Radar size={13} className="text-rose-500 animate-pulse" />
+                          ) : (
+                            <Terminal size={13} className="text-blue-500" />
+                          )}
                         </div>
                         {/* Glowing Health Indicator */}
                         <div className="relative flex items-center justify-center">
@@ -207,7 +226,18 @@ export default function AgentDashboard({ isActive }) {
                             title={isHealthy ? "100% Healthy" : `${errorRate}% Error Rate`}
                           />
                         </div>
-                        <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{name}</span>
+                        <span className={`text-xs font-bold ${
+                          isSentinel 
+                            ? 'text-rose-700 dark:text-rose-300 font-extrabold' 
+                            : 'text-zinc-900 dark:text-zinc-100'
+                        }`}>
+                          {name}
+                        </span>
+                        {isSentinel && (
+                          <span className="px-1.5 py-0.2 rounded text-[8px] font-extrabold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 uppercase">
+                            AUTONOMY
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center space-x-1.5">
                         {intercepts > 0 && (
@@ -217,7 +247,11 @@ export default function AgentDashboard({ isActive }) {
                           </span>
                         )}
                         {info.tier && info.tier !== 'none' && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            isSentinel
+                              ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
+                              : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800'
+                          }`}>
                             {info.tier}
                           </span>
                         )}
@@ -230,7 +264,11 @@ export default function AgentDashboard({ isActive }) {
                         {info.role}{" "}
                         <button 
                           onClick={() => setSelectedAgent({ name, info, metrics: agentMetrics })}
-                          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold underline underline-offset-2 ml-1 cursor-pointer transition-colors"
+                          className={`inline-flex items-center font-semibold underline underline-offset-2 ml-1 cursor-pointer transition-colors ${
+                            isSentinel 
+                              ? 'text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300'
+                              : 'text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'
+                          }`}
                         >
                           more
                         </button>
@@ -310,7 +348,7 @@ export default function AgentDashboard({ isActive }) {
             })}
           </div>
 
-          {/* Disabled / Inactive Agents Section (When Ask Mode is Off) */}
+          {/* Disabled / Inactive Agents Section (When Ask Mode or Sentinel is Off) */}
           {disabledAgents.length > 0 && (
             <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
               <div className="flex items-center justify-between">
@@ -320,7 +358,7 @@ export default function AgentDashboard({ isActive }) {
                     Inactive Agents ({disabledAgents.length})
                   </span>
                   <span className="px-2 py-0.5 rounded-md text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border border-zinc-200 dark:border-zinc-700">
-                    Ask Mode Disabled
+                    Experimental Flag Disabled
                   </span>
                 </div>
               </div>
@@ -328,6 +366,7 @@ export default function AgentDashboard({ isActive }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-60 hover:opacity-100 transition-opacity">
                 {disabledAgents.map(([name, info]) => {
                   const agentMetrics = telemetry?.agents?.[name] || {};
+                  const isSentinel = name === 'SentinelScannerAgent';
                   return (
                     <div 
                       key={name}
@@ -336,13 +375,13 @@ export default function AgentDashboard({ isActive }) {
                       <div className="flex justify-between items-start">
                         <div className="flex items-center space-x-2">
                           <div className="p-1 rounded-md bg-zinc-200/60 dark:bg-zinc-800 text-zinc-500">
-                            <Terminal size={13} />
+                            {isSentinel ? <Radar size={13} /> : <Terminal size={13} />}
                           </div>
                           <span className="w-2.5 h-2.5 rounded-full bg-zinc-400 dark:bg-zinc-600" title="Disabled" />
                           <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{name}</span>
                         </div>
                         <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700">
-                          DISABLED
+                          {isSentinel ? 'SENTINEL OFF' : 'ASK MODE OFF'}
                         </span>
                       </div>
                       

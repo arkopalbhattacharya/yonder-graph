@@ -27,6 +27,7 @@ import InvestigationStepper from './InvestigationStepper';
 import EnrichmentAgentModal from './EnrichmentAgentModal';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { syncUrl } from '../utils/navigation';
 
 const RESOLVE_HIERARCHY_STEPS = [
   {
@@ -124,7 +125,7 @@ const RESOLVE_HIERARCHY_STEPS = [
       { name: 'cognitive_reasoning_trace', type: 'skill' }
     ],
     subSteps: [
-      'Synthesizing operational summaries for L1 Floor Ops, L2 Support, and L3 Architect',
+      'Synthesizing operational summaries for L1 Floor Ops, L2 Support, and L3 SME',
       'Constructing deep multi-agent triage reasoning and decision trace'
     ]
   }
@@ -250,6 +251,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
   const handleSwitchPersona = (newPersona) => {
     if (newPersona === persona) return;
     setPersona(newPersona);
+    syncUrl(newPersona, messages.length > 0 ? activeSessionId : null);
     if (messages.length === 0) {
       // stay on clean splash
     } else {
@@ -275,6 +277,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    syncUrl(persona, activeSessionId);
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -289,6 +292,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
         userQuery: queryToSend,
         feedbackStatus: null
       };
+      syncUrl(persona, activeSessionId);
       
       // Accumulate tokens for the current session in localStorage
       try {
@@ -569,10 +573,12 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
         <div className="w-full h-full overflow-y-auto flex flex-col items-center justify-center p-4 sm:p-6 custom-scrollbar">
           <div className="w-full max-w-2xl sm:max-w-3xl flex flex-col items-center text-center space-y-4 my-auto">
             
-            {/* Very Large Bold Screen-Adjusting Title (No Icons) */}
+            {/* Very Large Bold Screen-Adjusting Title with Flickering Underscore Cursor */}
             <div className="w-full pb-2">
-              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter font-mono text-zinc-900 dark:text-zinc-100 select-none">
-                yonder_graph
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter font-mono text-zinc-900 dark:text-zinc-100 select-none inline-flex items-baseline justify-center">
+                <span>yonder</span>
+                <span className="cursor-flicker text-blue-600 dark:text-blue-400 font-extrabold inline-block mx-[0.5px]">_</span>
+                <span>graph</span>
               </h1>
             </div>
 
@@ -885,9 +891,9 @@ function PersonaSummaryCard({ content, msgPersona }) {
                   ? 'bg-white dark:bg-zinc-800 text-purple-600 dark:text-purple-400 font-bold shadow-2xs'
                   : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
-              title="L3 Core Engineers & DBAs View"
+              title="L3 SME / DBAs View"
             >
-              L3 Architect
+              L3 SME
             </button>
           </div>
         </div>
@@ -903,33 +909,131 @@ function PersonaSummaryCard({ content, msgPersona }) {
   );
 }
 
+function formatReasoningBlocks(rawText) {
+  if (!rawText || typeof rawText !== 'string') return [];
+
+  let text = rawText.trim();
+
+  // 1. Separate inline category emojis or headers if joined without newlines
+  text = text.replace(/([.!?])\s*([🎯📖🔍🛡️⚡⚖️🔒✨🚀💡])/g, '$1\n\n$2');
+  text = text.replace(/([.!?])\s*(?=[-•*]?\s*\*\*(?:Intent|Knowledge|SOP|SQL|AST|Governance|Safety|Investigation|Triage|Humanizing))/gi, '$1\n\n');
+
+  // 2. Split on double newlines or lines starting with bullet/emoji/header
+  let rawBlocks = text.split(/\n\s*\n+/).map(s => s.trim()).filter(Boolean);
+
+  // If there's only 1 block but contains multiple emojis or bulleted points, split by bullet / emoji
+  if (rawBlocks.length === 1) {
+    const splitRegex = /(?=(?:^|\n)\s*(?:[-*•]\s*)?(?:[🎯📖🔍🛡️⚡⚖️🔒✨🚀💡]|###|\*\*[^*]+?\*\*:?))/;
+    const splitItems = text.split(splitRegex).map(s => s.trim()).filter(Boolean);
+    if (splitItems.length > 1) {
+      rawBlocks = splitItems;
+    }
+  }
+
+  // If still 1 block and contains inline emojis
+  if (rawBlocks.length === 1) {
+    const emojiRegex = /(?=[🎯📖🔍🛡️⚡⚖️🔒✨🚀💡])/;
+    const emojiBlocks = text.split(emojiRegex).map(s => s.trim()).filter(Boolean);
+    if (emojiBlocks.length > 1) {
+      rawBlocks = emojiBlocks;
+    }
+  }
+
+  return rawBlocks.map((block) => {
+    // Clean block from leading bullets, markdown hashes, and emojis
+    let cleaned = block
+      .replace(/^[-*•]\s*/, '')
+      .replace(/^#+\s*/, '')
+      .replace(/^[🎯📖🔍🛡️⚡⚖️🔒✨🚀💡🔹]\s*/, '')
+      .trim();
+
+    // Detect Title
+    let title = null;
+    let body = cleaned;
+
+    const boldTitleMatch = cleaned.match(/^\*\*([^*]+?)\*\*[:\s—-]*(.*)$/s);
+    if (boldTitleMatch) {
+      title = boldTitleMatch[1].replace(/[:\s—-]+$/, '').trim();
+      body = boldTitleMatch[2].trim();
+    } else {
+      const colonTitleMatch = cleaned.match(/^([^:\n]{3,50}):\s+(.*)$/s);
+      if (colonTitleMatch && !colonTitleMatch[1].includes('.')) {
+        title = colonTitleMatch[1].trim();
+        body = colonTitleMatch[2].trim();
+      }
+    }
+
+    if (title) {
+      // Strip any markdown or emoji characters from the title
+      title = title
+        .replace(/[*_~`#]/g, '')
+        .replace(/[🎯📖🔍🛡️⚡⚖️🔒✨🚀💡🔹]/g, '')
+        .replace(/^[-•*:]+\s*/, '')
+        .replace(/[:\s—-]+$/, '')
+        .trim();
+    }
+
+    // Strip leading emoji from body if any remain
+    body = body.replace(/^[🎯📖🔍🛡️⚡⚖️🔒✨🚀💡🔹]\s*/, '').trim();
+
+    return {
+      title,
+      body: body || cleaned
+    };
+  });
+}
+
 function ReasoningSection({ reasoning, isEnabled }) {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!isEnabled || !reasoning || !reasoning.trim()) return null;
+
+  const blocks = formatReasoningBlocks(reasoning);
 
   return (
     <div className="pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800/80 font-mono">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800 transition-colors cursor-pointer"
+        className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-blue-50/60 hover:bg-blue-100/80 dark:bg-blue-950/30 dark:hover:bg-blue-900/40 text-[11px] text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/60 transition-colors cursor-pointer"
       >
-        <BrainCircuit size={13} className="text-purple-500" />
+        <BrainCircuit size={13} className="text-blue-500" />
         <span className="font-semibold">{isOpen ? 'Hide Reasoning' : 'Show Reasoning'}</span>
-        {isOpen ? <ChevronUp size={12} className="text-zinc-400" /> : <ChevronDown size={12} className="text-zinc-400" />}
+        {isOpen ? <ChevronUp size={12} className="text-blue-400" /> : <ChevronDown size={12} className="text-blue-400" />}
       </button>
 
       {isOpen && (
-        <div className="mt-2.5 p-3.5 rounded-xl bg-purple-50/30 dark:bg-purple-950/20 border border-purple-200/60 dark:border-purple-900/40 text-xs animate-in fade-in slide-in-from-top-1 duration-150">
-          <div className="flex items-center space-x-1.5 text-purple-700 dark:text-purple-300 font-bold text-[11px] mb-2 pb-1.5 border-b border-purple-200/40 dark:border-purple-900/40">
+        <div className="mt-2.5 p-3.5 rounded-xl bg-blue-50/30 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40 text-xs animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="flex items-center space-x-1.5 text-blue-700 dark:text-blue-300 font-bold text-[11px] mb-3 pb-2 border-b border-blue-200/40 dark:border-blue-900/40">
             <Sparkles size={12} />
             <span>Multi-Agent Triage Reasoning</span>
           </div>
-          <div className="markdown-prose text-xs leading-relaxed text-zinc-800 dark:text-zinc-200">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {reasoning}
-            </ReactMarkdown>
+
+          <div className="space-y-3.5 pt-0.5">
+            {blocks.map((block, idx) => (
+              <div key={idx} className="space-y-1">
+                {block.title && (
+                  <div className="text-xs font-bold text-blue-900 dark:text-blue-200">
+                    {block.title}
+                  </div>
+                )}
+                <div className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                      code: ({ children }) => (
+                        <code className="px-1.5 py-0.5 rounded bg-blue-100/70 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-[10.5px] font-mono border border-blue-200/50 dark:border-blue-800/50">
+                          {children}
+                        </code>
+                      )
+                    }}
+                  >
+                    {block.body}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

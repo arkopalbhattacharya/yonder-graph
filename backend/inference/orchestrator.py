@@ -1223,11 +1223,14 @@ CRITICAL TASKS:
 2. "l2_summary": Functional & technical triage summary tailored for L2 Application Support Engineers. Detail affected WMS tables (ORD, ORD_LINE, INVLOD), transaction state mismatches (e.g. allocation hold, lock contention), diagnostic findings, and operational checks.
 3. "l3_summary": Deep architectural & DBA summary tailored for L3 Core Engineers & DBAs. Detail Oracle table constraints, pessimistic locking flags, parameter bind sanitization, AST read-only validation status, ROWNUM <= 100 boundaries, and Four-Tier governance compliance.
 4. "narrative": General summary (defaulting to L1/L2 balanced overview).
-5. "reasoning": Comprehensive multi-agent reasoning chain formatted in clean markdown explaining:
-   - 🎯 **Intent & Domain Classification**: Why this query was classified as an operational incident in the {domain} domain.
-   - 📖 **Knowledge Base & SOP Selection**: Why SOP {matched_sop.get('sop_id', 'standard diagnostic') if matched_sop else 'standard diagnostic'} was retrieved and how it addresses the root cause.
-   - 🛡️ **SQL & AST Guard Enforcement**: How business parameters were sanitized and how Tier 2 AST read-only validation ensured zero database mutation.
-   - ⚖️ **Governance & Safety Policy**: Why the risk tier ({governance_result.get('risk_level', 'LOW_RISK_READONLY') if governance_result else 'LOW_RISK_READONLY'}) was assigned and what preconditions/rollback procedures apply.
+5. "reasoning": Comprehensive multi-agent triage reasoning chain explaining cognitive decisions. Format strictly into clean, readable paragraphs with clear double newlines between distinct sections:
+   - 🎯 **Intent & Domain Classification**: Paragraph explaining why this query was classified as an operational incident in the {domain} domain.
+   
+   - 📖 **Knowledge Base & SOP Selection**: Paragraph explaining why SOP {matched_sop.get('sop_id', 'standard diagnostic') if matched_sop else 'standard diagnostic'} was retrieved and how it addresses the root cause.
+   
+   - 🛡️ **SQL & AST Guard Enforcement**: Paragraph explaining how business parameters were sanitized and how Tier 2 AST read-only validation ensured zero database mutation.
+   
+   - ⚖️ **Governance & Safety Policy**: Paragraph explaining why the risk tier ({governance_result.get('risk_level', 'LOW_RISK_READONLY') if governance_result else 'LOW_RISK_READONLY'}) was assigned and what preconditions/rollback procedures apply.
 6. "sql_reasoning": Short concise explanation of the diagnostic SQL query.
 
 Return ONLY a valid JSON object:
@@ -1267,11 +1270,14 @@ Return ONLY a valid JSON object:
                 "l3_summary": f"Diagnostic pipeline executed for {query}: Oracle parameters sanitized, AST read-only validated with ROWNUM <= 100 boundaries, Level 1 MOCA governance verified.",
                 "narrative": default_summary,
                 "reasoning": (
-                    f"### 🧠 Multi-Agent Diagnostic Reasoning\n\n"
-                    f"- 🎯 **Intent Classification**: Verified incident triage query in domain `{domain}`.\n"
-                    f"- 📖 **SOP Retrieval**: Mapped against standard operating procedures in Neo4j.\n"
-                    f"- 🛡️ **SQL AST Guard**: Enforced read-only SELECT constraints on all generated diagnostic queries.\n"
-                    f"- ⚖️ **Governance**: Classified as `{governance_result.get('risk_level', 'LOW_RISK_READONLY') if governance_result else 'LOW_RISK_READONLY'}` compliant with Two-Tier safety policy."
+                    f"🎯 **Intent & Domain Classification**\n\n"
+                    f"Verified incident triage query mapped to the `{domain}` domain for automated parameter binding.\n\n"
+                    f"📖 **Knowledge Base & SOP Retrieval**\n\n"
+                    f"Traversed Neo4j domain graph and mapped against standard warehouse operating procedures to isolate root cause.\n\n"
+                    f"🛡️ **SQL AST Guard Enforcement**\n\n"
+                    f"Enforced read-only SELECT AST constraints and bound parameters safely with zero mutation.\n\n"
+                    f"⚖️ **Governance & Safety Policy**\n\n"
+                    f"Classified as `{governance_result.get('risk_level', 'LOW_RISK_READONLY') if governance_result else 'LOW_RISK_READONLY'}` compliant with multi-tier safety controls."
                 ),
                 "sql_reasoning": "Standard diagnostic query based on schema.",
                 "mermaid_diagram": "",

@@ -5,6 +5,49 @@
  */
 
 export const AGENT_PROFILES = {
+  SentinelScannerAgent: {
+    name: "SentinelScannerAgent",
+    title: "Autonomous Proactive WMS Health Sentinel",
+    tagline: "Autonomous 24/7 background diagnostic daemon detecting wave shortfalls, dock bottlenecks, and hold locks.",
+    primaryMission: "Continuously scans Oracle WMS tables (PCKWAV, RCVTRK, INVDTL, ORD) in read-only mode to detect operational deadlocks and auto-triage solutions before floor operations are impacted.",
+    category: "Autonomous Proactive Sentinel",
+    tier: "Tier 1 AST Read-Only Enforced",
+    healthStatus: "Continuous autonomous background poller operating strictly under SET TRANSACTION READ ONLY air gap.",
+    l1Summary: {
+      title: "L1 — Service Desk & Warehouse Operations",
+      audience: "Floor Operators, Shift Supervisors, Operations Incident Leads",
+      points: [
+        "Catches stuck pick waves and inventory shortages before warehouse pickers experience idle time.",
+        "Alerts floor supervisors to stagnant inbound trailers checked into dock doors >4 hours without receiving lines.",
+        "Provides 1-click 'Investigate in Copilot' button with pre-assembled root causes and solutions."
+      ]
+    },
+    l2Summary: {
+      title: "L2 — Application Support & Functional Triage",
+      audience: "WMS Functional Analysts, Application Support Engineers",
+      points: [
+        "Extracts business keys (wave_num, wh_id, lodnum, trknum) directly from table ground truth.",
+        "Automatically evaluates severity thresholds (CRITICAL, HIGH, WARNING) across all WMS domains.",
+        "Dispatches detected anomalies to the 7-agent squad in background to generate investigation steps in 1.2s."
+      ]
+    },
+    l3Summary: {
+      title: "L3 — Core Engineering, WMS Architects & DBAs",
+      audience: "Database Administrators, Backend Developers, Solutions Architects",
+      points: [
+        "Enforces 4-layer Zero-Mutation Air-Gap: AST SELECT Enforcer, session READ ONLY lock, and DB GRANT SELECT.",
+        "Runs with Oracle optimizer hints, strict ROWNUM <= 50 bounds, and 2.0s query timeouts to prevent locks.",
+        "Recommends pointing sweeps to Oracle Active Data Guard Read Replicas for zero-OLTP performance impact."
+      ]
+    },
+    governanceGuardrails: [
+      "Zero-Mutation Air-Gap: Mathematically prohibits all INSERT, UPDATE, DELETE, and DDL commands.",
+      "Pre-Execution AST Validation: Statements are decomposed via sqlparse and verified before execution.",
+      "Session Read-Only Mode: Executes 'SET TRANSACTION READ ONLY' on every database connection.",
+      "Strict Bounded Queries: Enforces ROWNUM <= 50 and maximum 2.0s execution timeout."
+    ]
+  },
+
   AskProcessAgent: {
     name: "AskProcessAgent",
     title: "Supply Chain Process & SOP Knowledge Guide",

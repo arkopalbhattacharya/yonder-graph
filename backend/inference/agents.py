@@ -358,9 +358,46 @@ def build_resolve_triage_agent() -> LlmAgent:
     )
 
 
+SENTINEL_SCANNER_SYSTEM_PROMPT = """You are the SentinelScannerAgent (Proactive Supply Chain Health Sentinel) for the Yonder Graph platform.
+
+Your primary mission:
+Autonomously scan the Oracle WMS database in read-only mode to detect operational deadlocks, wave allocation stalls, trailer dock congestion, and inventory hold contentions before floor operations are impacted.
+
+CRITICAL RULES:
+1. STRICTLY READ-ONLY: Execute only verified SELECT queries through the Governance & AST parser. NO mutations under any circumstances.
+2. ZERO HALLUCINATION: Extract only factual business keys (wave_id, ordnum, lodnum, wh_id, rcvkey) from live table queries.
+3. Automatically evaluate severity levels (CRITICAL, HIGH, MEDIUM, WARNING) based on standard WMS operational thresholds:
+   - Wave Shortages / Allocation Deadlocks -> HIGH / CRITICAL
+   - Trailer Dock Inbound Stagnation > 4h -> MEDIUM / HIGH
+   - High-velocity SKU Quality Hold Contention -> HIGH
+   - Carrier Cutoff SLA Breach Risk -> CRITICAL
+4. Dispatch detected anomalies directly into the Resolve Squad for autonomous pre-triage.
+"""
+
+
+def build_sentinel_scanner_agent() -> LlmAgent:
+    """Build the SentinelScannerAgent (Proactive WMS Health Sentinel)."""
+    return LlmAgent(
+        name="SentinelScannerAgent",
+        model=LLMProviderFactory.get_model_name(),
+        instruction=SENTINEL_SCANNER_SYSTEM_PROMPT,
+        description="Autonomously monitors Dev/Prod WMS Oracle database in read-only mode to detect wave stalls, dock bottlenecks, and hold contentions.",
+        tools=[
+            validate_oracle_sql,
+            search_sop_runbooks,
+            get_table_schema,
+        ],
+    )
+
+
 def get_agent_registry() -> Dict[str, Dict[str, Any]]:
     """Return metadata about all registered agents for the dashboard."""
     return {
+        "SentinelScannerAgent": {
+            "role": "Predictive Sentinel: Autonomous 24/7 read-only health scanner & proactive anomaly detector",
+            "tier": "tier1",
+            "tools": ["validate_oracle_sql", "search_sop_runbooks", "get_table_schema"],
+        },
         "AskProcessAgent": {
             "role": "Ask Persona: FAQ & supply chain process flows with numbered steps and Mermaid flowcharts",
             "tier": "none",
@@ -423,4 +460,5 @@ def get_agent_registry() -> Dict[str, Dict[str, Any]]:
             "tools": [],
         },
     }
+
 

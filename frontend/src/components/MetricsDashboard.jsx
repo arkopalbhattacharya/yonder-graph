@@ -32,7 +32,7 @@ export default function MetricsDashboard({ isActive }) {
       setData(res);
       setLastRefreshed(new Date());
     } catch (err) {
-      console.warn("Failed to load metrics from API, using fallback data:", err);
+      console.warn("Failed to load metrics from API:", err);
     } finally {
       setIsLoading(false);
     }

@@ -7,6 +7,7 @@
  * - /resolve -> Resolve Copilot
  * - /resolve/:sessionId -> Specific Resolve chat session
  * - /chat/:sessionId -> Direct session link (auto-detects persona)
+ * - /sentinel -> Predictive Supply Chain Sentinel
  * - /metrics -> Executive ROI & Metrics Dashboard
  * - /graph -> Knowledge Graph Visualizer
  * - /agents -> Agent Telemetry & Squad Dashboard
@@ -29,6 +30,9 @@ export function parseCurrentUrl() {
   }
   if (main === 'chat' || main === 'session' || main === 'c') {
     return { tab: null, sessionId: param };
+  }
+  if (main === 'sentinel') {
+    return { tab: 'sentinel', sessionId: null };
   }
   if (main === 'metrics') {
     return { tab: 'metrics', sessionId: null };
@@ -56,6 +60,7 @@ export function buildUrl(tab, sessionId) {
   if (tab === 'resolve') {
     return sessionId ? `/resolve/${sessionId}` : '/resolve';
   }
+  if (tab === 'sentinel') return '/sentinel';
   if (tab === 'metrics') return '/metrics';
   if (tab === 'graph') return '/graph';
   if (tab === 'agents') return '/agents';

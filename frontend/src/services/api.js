@@ -84,6 +84,12 @@ export const api = {
     
   // ── Governance ──
   getGovernancePolicy: () => fetchWithHandle(`${API_BASE}/governance/policy`),
+  getGovernanceInterceptions: (page = 1, pageSize = 25, filters = {}) => {
+    const params = new URLSearchParams({ page, page_size: pageSize });
+    if (filters.status) params.append('status', filters.status);
+    if (filters.risk_level) params.append('risk_level', filters.risk_level);
+    return fetchWithHandle(`${API_BASE}/governance/interceptions?${params.toString()}`);
+  },
 
   // ── Chat History & Sessions ──
   getChatSessions: () => fetchWithHandle(`${API_BASE}/chat/sessions`),
@@ -120,4 +126,40 @@ export const api = {
     }
     return data;
   },
+
+  // ── Predictive Supply Chain Sentinel ──
+  getSentinelStatus: () => fetchWithHandle(`${API_BASE}/sentinel/status`),
+  testOracleConnection: (payload) =>
+    fetchWithHandle(`${API_BASE}/sentinel/test-connection`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  connectOracle: (payload) =>
+    fetchWithHandle(`${API_BASE}/sentinel/connect`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  disconnectOracle: () =>
+    fetchWithHandle(`${API_BASE}/sentinel/disconnect`, {
+      method: 'POST',
+    }),
+  getSentinelAlerts: () => fetchWithHandle(`${API_BASE}/sentinel/alerts`),
+  runSentinelScan: () =>
+    fetchWithHandle(`${API_BASE}/sentinel/scan`, {
+      method: 'POST',
+    }),
+  autoTriageAlert: (alertId) =>
+    fetchWithHandle(`${API_BASE}/sentinel/auto-triage/${alertId}`, {
+      method: 'POST',
+    }),
+  dismissAlert: (alertId) =>
+    fetchWithHandle(`${API_BASE}/sentinel/dismiss-alert`, {
+      method: 'POST',
+      body: JSON.stringify({ alert_id: alertId }),
+    }),
+  updateScannerSettings: (payload) =>
+    fetchWithHandle(`${API_BASE}/sentinel/settings`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 };
