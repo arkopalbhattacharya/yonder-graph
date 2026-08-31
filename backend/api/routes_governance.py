@@ -37,6 +37,22 @@ def get_governance_policy():
 
     # Augment with Tier descriptions and technical details
     policy["governance_tiers"] = {
+        "tier0": {
+            "name": "Data Privacy & PII Perimeter (On-Premise Hybrid Engine)",
+            "description": (
+                "Zero-GPU on-premise privacy perimeter executing prior to all external LLM transmissions "
+                "and graph ingestion. Masks customer PII (names, emails, phones, physical addresses, cards) "
+                "using deterministic regex and lightweight contextual entity recognition."
+            ),
+            "capabilities": [
+                "Inbound user query PII tokenization (<PII_EMAIL_1>, <PII_NAME_1>)",
+                "Oracle WMS live query result cell-level sanitization",
+                "Knowledge Studio document upload PII stripping",
+                "SME feedback & correction runbook sanitization",
+                "Luhn algorithm credit card validation & masking",
+                "Ephemeral in-memory vault for session tracking",
+            ],
+        },
         "tier1": {
             "name": "Cognitive Governance (ADK GovernanceSafetyAgent)",
             "description": TIER1_DESCRIPTION,
@@ -98,18 +114,20 @@ def get_governance_interceptions(
     try:
         query = db.query(AgentAuditLog).filter(
             or_(
-                AgentAuditLog.agent_name == "GovernanceSafetyAgent",
+                AgentAuditLog.agent_name.in_(["GovernanceSafetyAgent", "PIISanitizerAgent"]),
                 AgentAuditLog.action_type.in_([
                     "GOVERNANCE_INTERCEPT",
                     "GOVERNANCE_DECISION",
                     "SAFETY_CHECK",
                     "AST_VALIDATION_FAILED",
+                    "PII_INTERCEPT",
                 ]),
                 AgentAuditLog.status.in_([
                     "BLOCKED_BY_GOVERNANCE",
                     "REQUIRES_APPROVAL",
                     "INTERCEPTED",
                     "POLICY_RESTRICTED",
+                    "PII_MASKED",
                 ]),
                 AgentAuditLog.governance_tier1_eval.isnot(None),
                 AgentAuditLog.governance_tier2_flags.isnot(None),
@@ -144,7 +162,17 @@ def get_governance_interceptions(
             tier1 = log.governance_tier1_eval or {}
             tier2 = log.governance_tier2_flags or {}
 
-            r_level = tier1.get("risk_level") or output_p.get("risk_level") or "LOW_RISK_READONLY"
+            is_pii = (
+                log.agent_name == "PIISanitizerAgent" 
+                or log.status == "PII_MASKED" 
+                or "PII" in str(tier1.get("risk_level", "")).upper()
+                or bool(output_p.get("masked_entities"))
+            )
+
+            r_level = (
+                "PII_INTERCEPTED" if is_pii 
+                else (tier1.get("risk_level") or output_p.get("risk_level") or "LOW_RISK_READONLY")
+            )
             if risk_level and risk_level.upper() not in str(r_level).upper():
                 continue
 
@@ -158,9 +186,16 @@ def get_governance_interceptions(
             domain = input_p.get("domain") or (
                 session.metadata_payload.get("domain")
                 if session and session.metadata_payload
-                else "General"
+                else "Privacy & Security" if is_pii else "General"
             )
-            action = input_p.get("action") or input_p.get("topic") or session_title or "Incident Investigation"
+            
+            masked_entities = output_p.get("masked_entities") or []
+            masked_count = input_p.get("masked_count") or output_p.get("masked_count") or len(masked_entities)
+
+            action = (
+                f"Customer PII Data Masking ({masked_count} tokens)" if is_pii
+                else (input_p.get("action") or input_p.get("topic") or session_title or "Incident Investigation")
+            )
 
             items.append({
                 "id": str(log.id),
@@ -175,17 +210,21 @@ def get_governance_interceptions(
                 "is_blocked": is_blocked,
                 "requires_approval": requires_approval,
                 "risk_level": r_level,
-                "tier_selected": tier1.get("selected_tier") or output_p.get("tier") or "LEVEL_1_MOCA",
-                "recommended_action": output_p.get("recommended_action") or "Enforce read-only SQL & MOCA execution",
+                "tier_selected": "TIER_0_PII_PERIMETER" if is_pii else (tier1.get("selected_tier") or output_p.get("tier") or "LEVEL_1_MOCA"),
+                "recommended_action": output_p.get("recommended_action") or ("Zero-GPU on-premise PII tokenization & session vault isolation" if is_pii else "Enforce read-only SQL & MOCA execution"),
                 "policy_justification": (
                     output_p.get("policy_justification")
+                    or tier1.get("policy_justification")
                     or tier1.get("justification")
-                    or "Enforces dual-tier read-only safety guardrails."
+                    or ("Tier 0 Perimeter masked sensitive customer PII tokens before external LLM dispatch." if is_pii else "Enforces dual-tier read-only safety guardrails.")
                 ),
                 "moca_command": output_p.get("moca_command"),
                 "preconditions": output_p.get("preconditions") or [],
                 "rollback_steps": output_p.get("rollback_steps") or [],
                 "tier2_flags": tier2,
+                "is_pii": is_pii,
+                "masked_count": masked_count,
+                "masked_entities": masked_entities,
                 "execution_time_ms": log.execution_time_ms,
                 "tokens_used": log.tokens_used,
             })

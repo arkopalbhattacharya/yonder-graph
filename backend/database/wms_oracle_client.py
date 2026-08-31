@@ -220,7 +220,11 @@ class WMSOracleClient:
                 results.append(row_dict)
 
             cursor.close()
-            return results
+
+            # ── Tier 0 On-Premise PII Sanitization ──
+            from backend.governance.pii_perimeter import pii_engine
+            sanitized_results, _ = pii_engine.sanitize_tabular_data(results)
+            return sanitized_results
         finally:
             conn.close()
 

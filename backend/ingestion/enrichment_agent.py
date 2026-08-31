@@ -22,6 +22,7 @@ from backend.governance.safety_rules import MUTATION_TOKENS
 from backend.database.neo4j_client import neo4j_client
 from backend.audit.audit_logger import audit_logger
 from backend.config import settings
+from backend.inference.json_utils import extract_json_from_llm
 
 logger = logging.getLogger(__name__)
 
@@ -449,12 +450,10 @@ class EnrichmentAgent:
                 max_tokens=2048,
             )
             result_text = response.choices[0].message.content
-            # Parse JSON from response
-            if "```json" in result_text:
-                result_text = result_text.split("```json")[1].split("```")[0]
-            elif "```" in result_text:
-                result_text = result_text.split("```")[1].split("```")[0]
-            return json.loads(result_text.strip())
+            parsed = extract_json_from_llm(result_text, default=[])
+            if isinstance(parsed, list):
+                return parsed
+            return []
         except Exception as e:
             logger.warning("LLM entity extraction failed: %s", e)
             return []

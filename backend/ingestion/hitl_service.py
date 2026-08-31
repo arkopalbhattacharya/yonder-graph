@@ -77,6 +77,17 @@ class HITLService:
                 "error": "Feedback entry not found",
             }
 
+        # ── Tier 0 On-Premise PII Sanitization ──
+        from backend.governance.pii_perimeter import pii_engine
+        if corrected_triage_steps:
+            corrected_triage_steps = pii_engine.sanitize_text(corrected_triage_steps)["sanitized_text"]
+        if corrected_sql:
+            corrected_sql = pii_engine.sanitize_text(corrected_sql)["sanitized_text"]
+        if corrected_moca:
+            corrected_moca = pii_engine.sanitize_text(corrected_moca)["sanitized_text"]
+        if root_cause_criteria:
+            root_cause_criteria = pii_engine.sanitize_text(root_cause_criteria)["sanitized_text"]
+
         # ── Quality Guardrail 1: Comprehensiveness Check ──
         guardrail_errors = self._check_comprehensiveness(
             original=original.get("generated_response", {}),

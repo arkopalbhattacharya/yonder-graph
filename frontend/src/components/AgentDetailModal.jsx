@@ -174,7 +174,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
                 onClick={() => setActiveTab('l3')}
                 className={`px-2.5 py-1 rounded-md transition-colors ${
                   activeTab === 'l3' 
-                    ? 'bg-purple-500 text-white font-bold shadow-2xs' 
+                    ? 'bg-blue-600 text-white font-bold shadow-2xs' 
                     : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -232,19 +232,19 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
 
             {/* L3 Card */}
             {(activeTab === 'all' || activeTab === 'l3') && (
-              <div className="p-4 rounded-xl border border-purple-200/70 dark:border-purple-900/40 bg-purple-50/40 dark:bg-purple-950/20 space-y-2.5">
+              <div className="p-4 rounded-xl border border-blue-200/70 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="w-2 h-2 rounded-full bg-purple-500" />
-                    <span className="font-bold text-xs text-purple-800 dark:text-purple-300 uppercase tracking-wide">
+                    <span className="w-2 h-2 rounded-full bg-blue-600" />
+                    <span className="font-bold text-xs text-blue-800 dark:text-blue-300 uppercase tracking-wide">
                       {profile.l3Summary.title}
                     </span>
                   </div>
-                  <span className="text-[10px] text-purple-700/80 dark:text-purple-400/80 font-mono bg-purple-100 dark:bg-purple-900/50 px-2 py-0.5 rounded-md">
+                  <span className="text-[10px] text-blue-700/80 dark:text-blue-400/80 font-mono bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-md">
                     Audience: {profile.l3Summary.audience}
                   </span>
                 </div>
-                <ul className="space-y-1.5 pl-3 list-disc text-zinc-700 dark:text-zinc-300 marker:text-purple-500 text-xs">
+                <ul className="space-y-1.5 pl-3 list-disc text-zinc-700 dark:text-zinc-300 marker:text-blue-600 text-xs">
                   {profile.l3Summary.points.map((pt, idx) => (
                     <li key={idx} className="leading-relaxed">{pt}</li>
                   ))}
@@ -297,7 +297,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
           <div className="p-4 rounded-xl bg-zinc-50 dark:bg-[#16161a] border border-zinc-200 dark:border-zinc-800/80 space-y-3 font-mono">
             <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-bold tracking-wider">
               <div className="flex items-center space-x-1.5">
-                <Zap size={12} className="text-purple-500" />
+                <Zap size={12} className="text-blue-500" />
                 <span>Live Token & Invocation Telemetry</span>
               </div>
               <span>Total Invocations: {agentMetrics?.invocation_count || 0}</span>
@@ -306,7 +306,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="p-2.5 rounded-lg bg-white dark:bg-[#121215] border border-zinc-200 dark:border-zinc-800 space-y-1">
                 <span className="text-[10px] text-zinc-400 uppercase font-bold">Current Session (localStorage)</span>
-                <div className="text-sm font-bold text-purple-600 dark:text-purple-400">
+                <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
                   {agSession.total.toLocaleString()} tokens
                 </div>
                 <div className="flex items-center space-x-3 text-[10px] text-zinc-500 dark:text-zinc-400 pt-0.5">

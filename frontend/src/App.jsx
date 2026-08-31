@@ -115,8 +115,9 @@ export default function App() {
   const handleTabChange = useCallback((newTab) => {
     setActiveTab(newTab);
     const isChat = newTab === 'ask' || newTab === 'resolve';
-    syncUrl(newTab, isChat ? activeSessionId : null);
-  }, [activeSessionId]);
+    const hasExistingSession = isChat && sessions.some(s => s.session_id === activeSessionId);
+    syncUrl(newTab, hasExistingSession ? activeSessionId : null);
+  }, [activeSessionId, sessions]);
 
   const handleSelectSession = useCallback((sessionId) => {
     setActiveSessionId(sessionId);
@@ -131,15 +132,20 @@ export default function App() {
   }, [sessions, activeTab, enableAskMode]);
 
   const handleNewChat = useCallback(() => {
+    const targetTab = (activeTab === 'ask' || activeTab === 'resolve') ? activeTab : (enableAskMode ? 'ask' : 'resolve');
     const newId = crypto.randomUUID();
     setActiveSessionId(newId);
-    const targetTab = (activeTab === 'ask' || activeTab === 'resolve') ? activeTab : (enableAskMode ? 'ask' : 'resolve');
     setActiveTab(targetTab);
-    syncUrl(targetTab, newId);
+    syncUrl(targetTab, null);
   }, [activeTab, enableAskMode]);
 
   const handleTogglePin = async (sessionId, currentPinned, e) => {
     e.stopPropagation();
+    const currentlyPinnedCount = sessions.filter(s => s.is_pinned).length;
+    if (!currentPinned && currentlyPinnedCount >= 5) {
+      alert("Maximum of 5 pinned sessions reached. Please unpin a session first.");
+      return;
+    }
     try {
       await api.togglePinSession(sessionId, !currentPinned);
       fetchSessions();

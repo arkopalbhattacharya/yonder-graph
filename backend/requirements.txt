@@ -33,3 +33,6 @@ httpx>=0.27.0
 
 # Utilities
 uuid6>=2024.7.10
+
+# Tier 0 On-Premise PII Perimeter (0 GPU / CPU NER)
+gliner>=0.2.8

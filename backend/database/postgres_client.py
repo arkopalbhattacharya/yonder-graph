@@ -51,12 +51,28 @@ def get_session_factory() -> sessionmaker:
     return _SessionLocal
 
 
+from contextlib import contextmanager
+
 def get_db() -> Generator[Session, None, None]:
     """FastAPI dependency: yields a database session and ensures cleanup."""
     session_factory = get_session_factory()
     session = session_factory()
     try:
         yield session
+    finally:
+        session.close()
+
+@contextmanager
+def get_db_context() -> Generator[Session, None, None]:
+    """Context manager for standalone database sessions."""
+    session_factory = get_session_factory()
+    session = session_factory()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
     finally:
         session.close()
 
@@ -74,6 +90,7 @@ def init_db() -> None:
         ChatFeedbackLog,
         ChatSession,
         ChatMessage,
+        ExecutiveRoiMetric,
     )
 
     engine = get_engine()

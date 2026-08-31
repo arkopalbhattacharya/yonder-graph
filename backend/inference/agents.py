@@ -1,12 +1,13 @@
 """
-Yonder Graph — Google ADK Multi-Agent Definitions
+Yonder Graph — Multi-Agent Squad Definitions
 
-Constructs the hierarchical agent squad using Google ADK (google-adk):
-  1. TriageRoutingAgent — Parses incidents, extracts business keys, routes by domain
-  2. GraphRAGDiagnosticAgent — Traverses Neo4j for matching SOPs and table joins
-  3. SQLParameterBindingAgent — Binds parameters using Oracle bind variable syntax
-  4. GovernanceSafetyAgent — Tier 1 cognitive governance advisor
-  5. CoordinatorAgent — Orchestrates multi-agent handoffs and response assembly
+Constructs the hierarchical agent squad for WMS inference and triage:
+  1. ContextManagementAgent — Tracks per-chat conversation turns and resolves follow-ups
+  2. TriageRoutingAgent — Parses incidents, extracts business keys, routes by domain
+  3. GraphRAGDiagnosticAgent — Traverses Neo4j for matching SOPs and table joins
+  4. SQLParameterBindingAgent — Binds parameters using Oracle bind variable syntax
+  5. GovernanceSafetyAgent — Tier 1 cognitive governance advisor
+  6. CoordinatorAgent — Orchestrates multi-agent handoffs and response assembly
 
 All agents use LLMProviderFactory for inference, ensuring portability
 across all configured LLM providers.
@@ -390,9 +391,34 @@ def build_sentinel_scanner_agent() -> LlmAgent:
     )
 
 
+CONTEXT_MANAGEMENT_SYSTEM_PROMPT = """You are the ContextManagementAgent (Per-Chat Session Context & Multi-Turn Manager) for the Yonder Graph platform.
+
+Your primary mission:
+1. Track per-chat conversation history, extracted business entities (ORDNUM, WH_ID, LODNUM, DTLNUM), and prior diagnostic conclusions across multiple query turns.
+2. Contextualize follow-up queries by resolving references (pronouns, implicit order references, previous SQL outputs) into fully-qualified diagnostic prompts.
+3. Enforce triage interaction policies: When multi-turn follow-ups are restricted, enforce single-turn incident isolation. When enabled, coordinate with the upstream Tier 0 PII Perimeter and downstream multi-agent squad (Intent, Domain Graph, SOP, SQL, AST, Governance).
+"""
+
+
+def build_context_management_agent() -> LlmAgent:
+    """Build the ContextManagementAgent (Per-Chat Context Management Agent)."""
+    return LlmAgent(
+        name="ContextManagementAgent",
+        model=LLMProviderFactory.get_model_name(),
+        instruction=CONTEXT_MANAGEMENT_SYSTEM_PROMPT,
+        description="Tracks per-chat conversation state, resolves multi-turn follow-up queries, and manages session context boundaries.",
+        tools=[],
+    )
+
+
 def get_agent_registry() -> Dict[str, Dict[str, Any]]:
     """Return metadata about all registered agents for the dashboard."""
     return {
+        "ContextManagementAgent": {
+            "role": "Context Management: Tracks per-chat conversation turns, resolves follow-up queries, and guards session boundaries",
+            "tier": "tier1",
+            "tools": [],
+        },
         "SentinelScannerAgent": {
             "role": "Predictive Sentinel: Autonomous 24/7 read-only health scanner & proactive anomaly detector",
             "tier": "tier1",
@@ -453,6 +479,11 @@ def get_agent_registry() -> Dict[str, Dict[str, Any]]:
             "role": "Natural language synthesis, IT engineer narrative formatting, and SQL reasoning breakdown",
             "tier": "none",
             "tools": [],
+        },
+        "PIISanitizerAgent": {
+            "role": "Tier 0 Data Privacy: On-premise regex + offline GLiNER AI entity recognizer & session tokenization",
+            "tier": "tier0",
+            "tools": ["sanitize_text", "sanitize_tabular_data"],
         },
         "CoordinatorAgent": {
             "role": "Dual-track multi-agent orchestration, audit logging, and response assembly",

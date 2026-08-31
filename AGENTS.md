@@ -13,3 +13,11 @@ Whenever the user asks to **"make this as an experimental feature"**:
 2. **Add to Settings Popover**: Add a toggle row under `Experimental Features` in `Sidebar.jsx` with title, `BETA` pill, 1-sentence description, and toggle switch.
 3. **Frontend Conditioning**: Use `useSettings()` to conditionally render views, tabs, buttons, or modals.
 4. **Backend Conditioning**: Guard backend execution pathways accordingly when the feature is active or inactive.
+
+## Chat Feature Modifications
+Whenever the user asks to make any changes or additions to the **chat feature** (unless they explicitly specify the target mode):
+- **ALWAYS pause and ask the user** which mode to apply the changes in:
+  1. **Ask Mode**
+  2. **Resolve Mode**
+  3. **Both**
+- Do not make assumptions on mode scope before receiving the user's confirmation.

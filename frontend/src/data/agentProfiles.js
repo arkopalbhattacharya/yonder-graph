@@ -134,42 +134,43 @@ export const AGENT_PROFILES = {
 
   IntentClassifierAgent: {
     name: "IntentClassifierAgent",
-    title: "Cognitive Intent Gateway & Persona Classifier",
-    tagline: "Fast semantic classifier routing incoming user prompts to Ask or Resolve pipelines.",
-    primaryMission: "Analyzes natural language queries and ticket logs to classify intent between General Process Guidance (Ask) and Active Incident Triage (Resolve).",
-    category: "Cognitive Routing & Gateway",
-    tier: "Gateway Classifier",
-    healthStatus: "Low-latency deterministic classifier with zero database dependencies.",
+    title: "Cognitive Intent Gateway & Domain Boundary Guard",
+    tagline: "Semantic classifier enforcing strict supply chain domain boundaries and mode-specific routing (Ask vs Resolve).",
+    primaryMission: "Analyzes incoming user queries to classify operational intent between General Process Guidance (Ask Mode) and Active Production Incident Triage (Resolve Mode), while intercepting out-of-scope queries and mode mismatches before graph traversal.",
+    category: "Cognitive Routing & Gateway Guard",
+    tier: "Gateway Classifier & Domain Guard",
+    healthStatus: "Low-latency deterministic classifier enforcing domain boundaries and mode guardrails.",
     l1Summary: {
       title: "L1 — Service Desk & Warehouse Operations",
-      audience: "All Users, Operations Dispatchers",
+      audience: "All Users, Operations Dispatchers, Service Desk",
       points: [
-        "Removes guesswork by automatically routing questions to the correct specialized agent.",
-        "Understands casual phrasing, typos, and raw pasted system log snippets.",
-        "Provides instant feedback and response steering."
+        "Eliminates misrouted tickets by ensuring general process questions are routed through Ask Mode and production incidents through Resolve Mode.",
+        "Catches and stops out-of-scope queries (weather, general trivia, recipes) immediately with helpful supply chain example prompts.",
+        "Understands warehouse phrasing, typos, barcode scans, and raw pasted system logs."
       ]
     },
     l2Summary: {
       title: "L2 — Application Support & Functional Triage",
-      audience: "Incident Handlers, Support Specialists",
+      audience: "Incident Handlers, WMS Support Specialists",
       points: [
-        "Detects whether an inquiry requires read-only procedural knowledge or active entity diagnosis.",
-        "Extracts early domain flags (Inbound, Outbound, Inventory) to accelerate downstream routing.",
-        "Provides classified confidence metrics recorded in the audit trace."
+        "Enforces strict mode guardrails: GENERAL_PROCESS_INQUIRY is restricted to Ask Mode; INCIDENT_TRIAGE is restricted to Resolve Mode.",
+        "Intercepts mode mismatches at step 1 to guide analysts to the appropriate toolset with zero wasted database hops.",
+        "Extracts domain classification (Inbound, Outbound, Inventory) and records confidence metrics in the audit trace."
       ]
     },
     l3Summary: {
       title: "L3 — Core Engineering, WMS Architects & DBAs",
-      audience: "Architects, Security Engineers",
+      audience: "Architects, Security Engineers, Database Administrators",
       points: [
-        "Performs initial prompt injection and anomaly sanitization.",
-        "Operates with minimal token footprint (<75 tokens) for sub-50ms gateway decision times.",
-        "Maintains stateless, thread-safe routing logic with full audit telemetry logging."
+        "Domain Guardrail: Completely bypasses Neo4j graph traversal and SQL generation when queries are OUT_OF_SCOPE or mode-mismatched.",
+        "Fast-path keyword filtering alongside structured 3-category LLM JSON schema classification.",
+        "Logs full audit telemetry events (OUT_OF_SCOPE_INTERCEPT, MODE_MISMATCH_INTERCEPT) to PostgreSQL."
       ]
     },
     governanceGuardrails: [
-      "Strict input length limiting and prompt sanitization.",
-      "Fail-closed fallback defaults to AskProcessAgent for ambiguous inquiries."
+      "Strict Supply Chain Domain Boundary: Restricts queries strictly to Blue Yonder WMS, logistics, and Oracle database operations.",
+      "Operational Mode Guardrail: Hard-blocks GENERAL_PROCESS_INQUIRY in Resolve Mode and INCIDENT_TRIAGE in Ask Mode.",
+      "Zero-Graph Air Gap for Non-Matching Queries: Emits immediate client guidance without invoking Neo4j or SQL engines."
     ]
   },
 
@@ -501,6 +502,90 @@ export const AGENT_PROFILES = {
     governanceGuardrails: [
       "Requires schema verification before creating new database table nodes in Neo4j.",
       "Rejects duplicate SOP IDs and validates foreign key referential integrity in the graph."
+    ]
+  },
+
+  PIISanitizerAgent: {
+    name: "PIISanitizerAgent",
+    title: "Tier 0 On-Premise PII & Data Privacy Perimeter",
+    tagline: "Zero-GPU hybrid regex + contextual entity recognizer sanitizing personal data before LLM transmission.",
+    primaryMission: "Guarantees that sensitive customer data (credit cards, emails, phone numbers, physical addresses, names) is masked on-premise before external LLM dispatch or Neo4j persistence.",
+    category: "Data Privacy & Governance Perimeter",
+    tier: "Tier 0 On-Premise Privacy Perimeter",
+    healthStatus: "Active on-premise deterministic + NER sanitization running in <20ms on CPU.",
+    l1Summary: {
+      title: "L1 — Service Desk & Warehouse Operations",
+      audience: "Floor Operators, Service Desk, Customer Service",
+      points: [
+        "Automatically masks customer contact details and payment numbers in incident tickets.",
+        "Prevents customer PII from ever leaving company servers or appearing in external AI logs.",
+        "Enables safe troubleshooting using operational order and inventory IDs without privacy risks."
+      ]
+    },
+    l2Summary: {
+      title: "L2 — Application Support & Functional Triage",
+      audience: "Support Engineers, Incident Leads, Security Compliance",
+      points: [
+        "Sanitizes live Oracle WMS tabular database results before feeding into agent reasoning context.",
+        "Strips PII from uploaded Knowledge Studio runbooks and SME feedback corrections.",
+        "Maintains ephemeral session vaults for tokenized entity tracking (<PII_EMAIL_1>, <PII_NAME_1>)."
+      ]
+    },
+    l3Summary: {
+      title: "L3 — Core Engineering, WMS Architects & DBAs",
+      audience: "Security Officers, Cloud Architects, Compliance Auditors",
+      points: [
+        "Runs 100% on-premise on CPU with 0 GPU dependency and <300MB RAM footprint.",
+        "Executes Luhn algorithm checksum validation for credit cards and regex patterns for SSNs and phones.",
+        "Enforces strict data residency and compliance with GDPR, HIPAA, and CCPA privacy standards."
+      ]
+    },
+    governanceGuardrails: [
+      "Pre-LLM Execution: Operates before any cognitive agent evaluates the request.",
+      "Zero Data Egress: Sensitive plain-text tokens are held in ephemeral RAM vault only.",
+      "Dual-Pass Sanitization: Combines deterministic regex with contextual entity parsing."
+    ]
+  },
+
+  ContextManagementAgent: {
+    name: "ContextManagementAgent",
+    title: "Context & Multi-Turn Session Manager",
+    tagline: "Tracks per-chat conversation memory, business entity retention, and follow-up gating policies.",
+    primaryMission: "Maintains conversation state across query turns, contextualizes follow-up questions with prior diagnostic context, and enforces single-turn vs multi-turn triage interaction guardrails.",
+    category: "Session Memory & Orchestration Guard",
+    tier: "Tier 1 Cognitive Context Enforced",
+    healthStatus: "Active per-chat context tracker with single-turn policy gating enabled by default.",
+    l1Summary: {
+      title: "L1 — Service Desk & Warehouse Operations",
+      audience: "Floor Operators, Service Desk, Operations Incident Leads",
+      points: [
+        "Keeps track of order numbers and warehouse IDs across questions when follow-up mode is enabled.",
+        "Prevents cross-incident contamination by isolating each triage inquiry to a single turn by default.",
+        "Provides clear guidance when follow-ups are restricted, pointing operators to '+ new chat'."
+      ]
+    },
+    l2Summary: {
+      title: "L2 — Application Support & Functional Triage",
+      audience: "WMS Functional Analysts, Application Support Engineers",
+      points: [
+        "Resolves anaphoric references in follow-up queries ('why did that wave fail?', 'check the second order').",
+        "Merges previous SQL diagnostic results with subsequent follow-up queries for deep-dive root cause analysis.",
+        "Routes contextualized follow-up prompts through the full multi-agent squad (PII -> Intent -> SOP -> SQL -> AST -> Governance)."
+      ]
+    },
+    l3Summary: {
+      title: "L3 — Core Engineering, WMS Architects & DBAs",
+      audience: "System Architects, Compliance Officers, Platform Leads",
+      points: [
+        "Constructed using hierarchical session state management patterns.",
+        "Guards against context token explosion with sliding-window history extraction and PostgreSQL audit persistence.",
+        "Feature-flagged under experimental settings ('yg-experimental-followup') with zero backend overhead when disabled."
+      ]
+    },
+    governanceGuardrails: [
+      "Single-Turn Isolation: Prevents prompt bleed between distinct operational incidents when disabled.",
+      "Upstream PII Shielding: Follow-up contextualization occurs before Tier 0 PII de-tokenization to prevent token leaks.",
+      "Audit Trail Integrity: Every context evaluation and follow-up block is logged in PostgreSQL AgentAuditLog."
     ]
   }
 };

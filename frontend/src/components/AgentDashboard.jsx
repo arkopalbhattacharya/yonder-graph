@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Activity, Clock, ShieldAlert, Zap, Server, Terminal, Cpu, CheckCircle, AlertTriangle, ArrowDownRight, ArrowUpRight, PowerOff, Radar } from 'lucide-react';
+import { Activity, Clock, ShieldAlert, Zap, Server, Terminal, Cpu, CheckCircle, AlertTriangle, ArrowDownRight, ArrowUpRight, PowerOff, Radar, Shield } from 'lucide-react';
 import { api } from '../services/api';
 import { useSettings } from '../context/SettingsContext';
 import AgentDetailModal from './AgentDetailModal';
@@ -113,7 +113,7 @@ export default function AgentDashboard({ isActive }) {
             <h2 className="text-sm font-bold tracking-tight">agent_telemetry</h2>
           </div>
           <p className="text-zinc-500 dark:text-zinc-400 text-[11px] mt-0.5">
-            Google ADK Multi-Agent Squad metrics, live tokens & telemetry traces
+            Multi-Agent Squad metrics, live tokens & telemetry traces
           </p>
         </div>
         <div className="flex items-center space-x-2 text-[11px] bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xs">
@@ -148,7 +148,7 @@ export default function AgentDashboard({ isActive }) {
               subtext={`Lifetime In: ${(telemetry?.total_prompt_tokens || 0).toLocaleString()} • Out: ${(telemetry?.total_completion_tokens || 0).toLocaleString()}`}
               sessionBadge={`Session: ${(sessionTokens.total || 0).toLocaleString()} (${(sessionTokens.prompt || 0).toLocaleString()} in / ${(sessionTokens.completion || 0).toLocaleString()} out)`}
               icon={Zap} 
-              color="text-purple-500"
+              color="text-blue-500"
             />
             <StatCard 
               title="gov_intercepts" 
@@ -250,7 +250,7 @@ export default function AgentDashboard({ isActive }) {
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                             isSentinel
                               ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
-                              : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800'
+                              : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
                           }`}>
                             {info.tier}
                           </span>
@@ -296,7 +296,7 @@ export default function AgentDashboard({ isActive }) {
                     <div>
                       <div className="flex items-center justify-between font-bold text-zinc-500 dark:text-zinc-400 mb-1">
                         <span className="uppercase tracking-wider">Session Tokens</span>
-                        <span className="text-purple-600 dark:text-purple-400 font-bold">{sessionTotal.toLocaleString()}</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-bold">{sessionTotal.toLocaleString()}</span>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
                         <div className="flex items-center space-x-1 text-zinc-600 dark:text-zinc-400">
@@ -436,7 +436,7 @@ function StatCard({ title, value, subtext, sessionBadge, icon: Icon, color = "te
       {(subtext || sessionBadge) && (
         <div className="space-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800/60 text-[10px]">
           {subtext && <div className="text-zinc-500 dark:text-zinc-400 truncate">{subtext}</div>}
-          {sessionBadge && <div className="text-purple-600 dark:text-purple-400 font-semibold">{sessionBadge}</div>}
+          {sessionBadge && <div className="text-blue-600 dark:text-blue-400 font-semibold">{sessionBadge}</div>}
         </div>
       )}
     </div>

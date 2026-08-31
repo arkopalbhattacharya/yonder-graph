@@ -39,7 +39,18 @@ export default function Sidebar({
   onDeleteSession 
 }) {
   const { isDarkMode, toggleTheme } = useTheme();
-  const { enableAskMode, toggleAskMode, enableFileUpload, toggleFileUpload, enableShowReasoning, toggleShowReasoning, enableSentinel, toggleSentinel } = useSettings();
+  const { 
+    enableAskMode = false, 
+    toggleAskMode = () => {}, 
+    enableFileUpload = false, 
+    toggleFileUpload = () => {}, 
+    enableShowReasoning = false, 
+    toggleShowReasoning = () => {}, 
+    enableSentinel = false, 
+    toggleSentinel = () => {},
+    enableChatFollowup = false,
+    toggleChatFollowup = () => {},
+  } = useSettings() || {};
   const [health, setHealth] = useState(null);
   const [pendingReviews, setPendingReviews] = useState([]);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -87,8 +98,8 @@ export default function Sidebar({
     { id: 'metrics', label: 'metrics' },
   ];
 
-  const pinnedSessions = sessions.filter(s => s.is_pinned);
-  const recentSessions = sessions.filter(s => !s.is_pinned);
+  const pinnedSessions = sessions.filter(s => s.is_pinned).slice(0, 5);
+  const recentSessions = sessions.filter(s => !s.is_pinned).slice(0, 5);
   const pendingCount = pendingReviews.length;
 
   const handleNavigateToReview = () => {
@@ -474,6 +485,31 @@ export default function Sidebar({
                     enableSentinel ? 'bg-rose-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
                   }`}
                   title={enableSentinel ? "Disable Sentinel" : "Enable Sentinel"}
+                >
+                  <span className="w-3.5 h-3.5 rounded-full bg-white shadow-xs block" />
+                </button>
+              </div>
+
+              {/* Chat Follow-ups Toggle */}
+              <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
+                <div className="pr-2 min-w-0">
+                  <div className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 flex items-center space-x-1">
+                    <span>Chat Follow-ups</span>
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 font-bold border border-purple-200 dark:border-purple-800">
+                      BETA
+                    </span>
+                  </div>
+                  <div className="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 leading-tight">
+                    Multi-turn follow-up queries with session context management
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleChatFollowup}
+                  className={`w-8 h-4.5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
+                    enableChatFollowup ? 'bg-blue-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
+                  }`}
+                  title={enableChatFollowup ? "Disable Chat Follow-ups" : "Enable Chat Follow-ups"}
                 >
                   <span className="w-3.5 h-3.5 rounded-full bg-white shadow-xs block" />
                 </button>

@@ -32,12 +32,69 @@ export const api = {
   checkHealth: () => fetchWithHandle(`${API_BASE}/health`),
   
   // ── Triage ──
-  runTriage: (query, sessionId = null, persona = 'ask', signal = null) => 
+  runTriage: (query, sessionId = null, persona = 'ask', signal = null, enableFollowup = false) => 
     fetchWithHandle(`${API_BASE}/triage`, {
       method: 'POST',
-      body: JSON.stringify({ query, session_id: sessionId, persona }),
+      body: JSON.stringify({ query, session_id: sessionId, persona, enable_followup: enableFollowup }),
       signal: signal || undefined,
     }),
+  streamTriage: async (query, sessionId = null, persona = 'ask', onEvent = () => {}, signal = null, enableFollowup = false) => {
+    const response = await fetch(`${API_BASE}/triage/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query, session_id: sessionId, persona, enable_followup: enableFollowup }),
+      signal: signal || undefined,
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || errData.error || `HTTP ${response.status}: Stream Failed`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let finalPayload = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const blocks = buffer.split('\n\n');
+      buffer = blocks.pop() || '';
+
+      for (const block of blocks) {
+        if (!block.trim()) continue;
+        let eventType = 'message';
+        let dataStr = '';
+
+        for (const line of block.split('\n')) {
+          if (line.startsWith('event: ')) {
+            eventType = line.slice(7).trim();
+          } else if (line.startsWith('data: ')) {
+            dataStr = line.slice(6);
+          }
+        }
+
+        if (dataStr) {
+          try {
+            const parsedData = JSON.parse(dataStr);
+            if (eventType === 'final_payload') {
+              finalPayload = parsedData;
+            }
+            onEvent({ event: eventType, data: parsedData });
+          } catch (jsonErr) {
+            console.warn('Failed to parse SSE JSON frame:', jsonErr);
+          }
+        }
+      }
+    }
+
+    return finalPayload;
+  },
   consolidateSQL: (steps, sessionId = null, signal = null) =>
     fetchWithHandle(`${API_BASE}/triage/consolidate-sql`, {
       method: 'POST',

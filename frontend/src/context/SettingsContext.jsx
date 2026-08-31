@@ -1,6 +1,24 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-const SettingsContext = createContext();
+const defaultSettings = {
+  enableAskMode: false,
+  setEnableAskMode: () => {},
+  toggleAskMode: () => {},
+  enableFileUpload: false,
+  setEnableFileUpload: () => {},
+  toggleFileUpload: () => {},
+  enableShowReasoning: false,
+  setEnableShowReasoning: () => {},
+  toggleShowReasoning: () => {},
+  enableSentinel: false,
+  setEnableSentinel: () => {},
+  toggleSentinel: () => {},
+  enableChatFollowup: false,
+  setEnableChatFollowup: () => {},
+  toggleChatFollowup: () => {},
+};
+
+const SettingsContext = createContext(defaultSettings);
 
 export function SettingsProvider({ children }) {
   const [enableAskMode, setEnableAskMode] = useState(() => {
@@ -35,6 +53,14 @@ export function SettingsProvider({ children }) {
     return false;
   });
 
+  const [enableChatFollowup, setEnableChatFollowup] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('yg-experimental-followup');
+      return stored === 'true'; // Default: false (disabled)
+    }
+    return false;
+  });
+
   useEffect(() => {
     localStorage.setItem('yg-experimental-ask', String(enableAskMode));
   }, [enableAskMode]);
@@ -51,10 +77,15 @@ export function SettingsProvider({ children }) {
     localStorage.setItem('yg-experimental-sentinel', String(enableSentinel));
   }, [enableSentinel]);
 
+  useEffect(() => {
+    localStorage.setItem('yg-experimental-followup', String(enableChatFollowup));
+  }, [enableChatFollowup]);
+
   const toggleAskMode = () => setEnableAskMode(prev => !prev);
   const toggleFileUpload = () => setEnableFileUpload(prev => !prev);
   const toggleShowReasoning = () => setEnableShowReasoning(prev => !prev);
   const toggleSentinel = () => setEnableSentinel(prev => !prev);
+  const toggleChatFollowup = () => setEnableChatFollowup(prev => !prev);
 
   return (
     <SettingsContext.Provider
@@ -71,6 +102,9 @@ export function SettingsProvider({ children }) {
         enableSentinel,
         setEnableSentinel,
         toggleSentinel,
+        enableChatFollowup,
+        setEnableChatFollowup,
+        toggleChatFollowup,
       }}
     >
       {children}
@@ -81,7 +115,7 @@ export function SettingsProvider({ children }) {
 export function useSettings() {
   const context = useContext(SettingsContext);
   if (context === undefined) {
-    throw new Error('useSettings must be used within a SettingsProvider');
+    return defaultSettings;
   }
   return context;
 }
