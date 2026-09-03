@@ -1,6 +1,6 @@
 # Yonder Graph — Build & Run CLI Guide
 
-This guide details how to develop, test, build, diagnose, and run the complete Yonder Graph platform using the unified `Makefile` and `manage.py` CLI.
+This guide details how to develop, test, build, diagnose, and run the complete Yonder Graph platform across **macOS**, **Linux**, **Unix**, and **Windows** using the unified `Makefile` and `manage.py` CLI.
 
 ---
 
@@ -11,12 +11,23 @@ To start the entire application stack (PostgreSQL, Neo4j, FastAPI Backend, Raw P
 ```bash
 make dev
 ```
-*(or `./manage.py start`)*
+*(or `python manage.py dev`)*
 
 Once started, access the interfaces:
 - **Frontend Web UI**: [http://localhost:3000](http://localhost:3000)
 - **FastAPI OpenAPI Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **Neo4j Browser**: [http://localhost:7474](http://localhost:7474)
+
+---
+
+## 💻 Cross-Platform Compatibility
+
+The CLI is designed to run interchangeably across:
+- **macOS** (Darwin / Homebrew)
+- **Linux & Unix** (Ubuntu, Debian, RHEL, CentOS, FreeBSD)
+- **Windows** (PowerShell, Command Prompt, Git Bash, WSL2)
+
+On any platform with GNU `make`, type `make <target>`. If `make` is not available (such as a standard Windows installation), simply invoke `python manage.py <target>` with the exact same functionality.
 
 ---
 
@@ -29,15 +40,15 @@ Before running or troubleshooting, verify all dependencies, ports, and databases
 ```bash
 make doctor
 # or
-./manage.py doctor
+python manage.py doctor
 ```
 
 **Checks Performed:**
-- Python 3.10+ Virtual Environment (`venv/bin/python3`)
+- Python 3.10+ Virtual Environment (`venv/bin/python3` or `venv\Scripts\python.exe`)
 - Node.js runtime & npm
 - `.env` configuration file & API keys
-- PostgreSQL service on port `5432`
-- Neo4j Bolt connection on port `7687`
+- PostgreSQL service on port `5432` (with OS-specific startup tips)
+- Neo4j Bolt connection on port `7687` (with OS-specific startup tips)
 - FastAPI Backend on port `8000` (`/api/health`)
 - Vite Frontend Dev Server on port `3000`
 
@@ -45,13 +56,13 @@ make doctor
 
 ### 2. Runtime & Service Lifecycle
 
-| Command | Description |
-| :--- | :--- |
-| **`make start`** (or `make dev`) | Starts all background services with dependency ordering and health check validation. |
-| **`make restart`** | Gracefully stops all components, restarts PostgreSQL, Neo4j, backend, poller, and frontend, and polls `/api/health` until ready. |
-| **`make stop`** | Terminates all running application processes and cleans up PID files. |
-| **`make logs`** | Streams live backend logs (`/tmp/yonder-graph/backend.log`). |
-| **`make logs SERVICE=poller`** | Streams live background knowledge poller logs (`/tmp/yonder-graph/poller.log`). |
+| Command | Python Direct Command | Description |
+| :--- | :--- | :--- |
+| **`make start`** *(or `make dev`)* | `python manage.py dev` | Starts all background services with dependency ordering and health check validation. |
+| **`make restart`** | `python manage.py restart` | Gracefully stops all components, cycles services, and polls `/api/health` until ready. |
+| **`make stop`** | `python manage.py stop` | Terminates all running application processes and cleans up PID files. |
+| **`make logs`** | `python manage.py logs` | Streams live backend logs (`backend.log`). |
+| **`make logs SERVICE=poller`** | `python manage.py logs poller` | Streams live background knowledge poller logs (`poller.log`). |
 
 ---
 
@@ -62,7 +73,7 @@ To populate or refresh the Neo4j Knowledge Graph with canonical WMS domain model
 ```bash
 make ingest
 # or
-./manage.py ingest
+python manage.py ingest
 ```
 
 This parses canonical JSON definitions in `knowledge/canonical_sops/` and builds the relational graph in Neo4j without LLM hallucination.
@@ -76,7 +87,7 @@ Run the automated unit, integration, and governance rule test suite:
 ```bash
 make test
 # or
-./manage.py test
+python manage.py test
 ```
 
 **Test Coverage Includes:**
@@ -95,7 +106,7 @@ To compile the React / Vite frontend production bundle:
 ```bash
 make build
 # or
-./manage.py build
+python manage.py build
 ```
 
 Compiled static assets are generated in `frontend/dist/`.
@@ -104,8 +115,10 @@ Compiled static assets are generated in `frontend/dist/`.
 
 ### 6. Maintenance & Cleanup
 
-To remove compiled Python bytecode (`__pycache__`), `.pyc` files, and stale runtime PIDs:
+To remove compiled Python bytecode (`__pycache__`), `.pyc` files, Vite cache, and stale runtime PIDs:
 
 ```bash
 make clean
+# or
+python manage.py clean
 ```

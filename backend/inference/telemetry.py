@@ -93,6 +93,8 @@ class TelemetryCollector:
         self._agents: Dict[str, AgentMetrics] = defaultdict(AgentMetrics)
         self._global_start_time = time.time()
         self._total_sessions: int = 0
+        self._total_queries: int = 0
+        self._session_queries: int = 0
         self._current_session_id: Optional[str] = None
 
     def record_invocation(
@@ -182,11 +184,27 @@ class TelemetryCollector:
             self._total_sessions += 1
             if session_id and self._current_session_id != session_id:
                 self._current_session_id = session_id
+                self._session_queries = 0
                 for m in self._agents.values():
                     m.session_invocation_count = 0
                     m.session_total_tokens = 0
                     m.session_prompt_tokens = 0
                     m.session_completion_tokens = 0
+
+    def record_query(self, session_id: Optional[str] = None) -> None:
+        """Record a user query/chat turn."""
+        with self._lock:
+            self._total_queries += 1
+            if session_id and self._current_session_id != session_id:
+                self._current_session_id = session_id
+                self._session_queries = 1
+                for m in self._agents.values():
+                    m.session_invocation_count = 0
+                    m.session_total_tokens = 0
+                    m.session_prompt_tokens = 0
+                    m.session_completion_tokens = 0
+            else:
+                self._session_queries += 1
 
     def get_agent_metrics(self, agent_name: str) -> Dict[str, Any]:
         """Get metrics for a specific agent."""
@@ -246,6 +264,8 @@ class TelemetryCollector:
                 "uptime_seconds": round(time.time() - self._global_start_time, 1),
                 "current_session_id": self._current_session_id,
                 "total_sessions": self._total_sessions,
+                "total_queries": self._total_queries,
+                "session_queries": self._session_queries,
                 "total_invocations": total_invocations,
                 "total_tokens": total_tokens,
                 "total_prompt_tokens": total_prompt_tokens,
