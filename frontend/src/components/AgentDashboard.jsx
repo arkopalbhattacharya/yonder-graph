@@ -102,6 +102,10 @@ export default function AgentDashboard({ isActive }) {
     return false;
   });
 
+  const sessionQueries = telemetry?.session_queries || 0;
+  const lifetimeQueries = telemetry?.total_queries || 0;
+  const activeSessionInvocations = Object.values(telemetry?.agents || {}).reduce((acc, ag) => acc + (ag.session_invocation_count || 0), 0);
+
   return (
     <div className="w-full h-full flex flex-col bg-surface-light dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 font-mono text-xs overflow-hidden relative">
       
@@ -129,9 +133,9 @@ export default function AgentDashboard({ isActive }) {
           {/* Top Stat Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
             <StatCard 
-              title="invocations" 
-              value={(telemetry?.total_invocations || 0).toLocaleString()} 
-              subtext={`Active Agents: ${activeAgents.length}`}
+              title="queries / invocations" 
+              value={`${(lifetimeQueries || 0).toLocaleString()} / ${(telemetry?.total_invocations || 0).toLocaleString()}`} 
+              sessionBadge={`Session: ${(sessionQueries || 0).toLocaleString()} ${sessionQueries === 1 ? 'query' : 'queries'} (${(activeSessionInvocations || 0).toLocaleString()} calls)`}
               icon={Activity} 
               color="text-blue-500"
             />

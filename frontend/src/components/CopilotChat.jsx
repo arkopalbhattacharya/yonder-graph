@@ -677,7 +677,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
           </div>
 
           <div className="flex items-center space-x-3 text-[10px]">
-            {content.total_latency_ms > 0 && <span>{content.total_latency_ms}ms</span>}
+            {content.total_latency_ms > 0 && <span>{(content.total_latency_ms / 1000).toFixed(2)}s</span>}
             <span className="text-emerald-600 dark:text-emerald-400">AST_PASS</span>
           </div>
         </div>
@@ -800,7 +800,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
             <div className="w-full">
               <form 
                 onSubmit={(e) => { e.preventDefault(); handleSubmit(e); }} 
-                className="relative flex items-end bg-white dark:bg-[#111114] border border-zinc-300 dark:border-zinc-800 rounded-xl shadow-xs focus-within:border-zinc-500 dark:focus-within:border-zinc-600 transition-all p-2"
+                className="relative flex items-center bg-white dark:bg-[#111114] border border-zinc-300 dark:border-zinc-800 rounded-xl shadow-xs focus-within:border-zinc-500 dark:focus-within:border-zinc-600 transition-all p-2"
               >
                 <textarea
                   ref={splashTextareaRef}
@@ -813,36 +813,26 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
                     }
                   }}
                   placeholder={randomPlaceholder}
-                  className="w-full bg-transparent border-0 py-2.5 px-2.5 pr-12 text-xs sm:text-sm font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 outline-none resize-none custom-scrollbar leading-relaxed"
-                  rows={2}
-                  style={{ minHeight: '48px', maxHeight: '100px' }}
+                  className={`w-full bg-transparent border-0 py-2.5 ${
+                    enableAskMode 
+                      ? (enableFileUpload ? 'pl-[156px]' : 'pl-[126px]') 
+                      : (enableFileUpload ? 'pl-[114px]' : 'pl-[80px]')
+                  } pr-12 text-xs sm:text-sm font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 outline-none resize-none custom-scrollbar leading-relaxed`}
+                  rows={1}
+                  style={{ minHeight: '46px', maxHeight: '120px' }}
                 />
-                
-                <button
-                  type="button"
-                  onClick={(e) => handleSubmit(e)}
-                  disabled={!input.trim()}
-                  className="absolute right-2.5 bottom-2.5 p-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 rounded-lg hover:opacity-90 disabled:opacity-30 transition-opacity flex-shrink-0"
-                  title="Submit (Enter)"
-                >
-                  <CornerDownLeft size={15} />
-                </button>
-              </form>
 
-              {/* Controls Under Chat Box: Staple Pin Upload + Ask/Resolve Toggle */}
-              <div className="flex items-center justify-between pt-2 px-1 text-xs">
-                <div className="flex items-center space-x-2">
-                  
-                  {/* Staple Pin Icon Button (Upload Document into Knowledge Graph - Experimental) */}
+                {/* Left Controls Inside Input Box: Ask / Resolve Toggle (+ File Upload) */}
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center space-x-1.5 z-10">
                   {enableFileUpload && (
                     <>
                       <button
                         type="button"
                         onClick={() => splashFileInputRef.current?.click()}
-                        className="p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900/90 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all flex items-center justify-center shadow-2xs cursor-pointer"
+                        className="p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all flex items-center justify-center cursor-pointer"
                         title="Upload Document into Supply Chain Knowledge Graph (.pdf, .ppt, .xls, .csv, .doc, .docx, .txt, .md)"
                       >
-                        <Paperclip size={14} className="-rotate-45" />
+                        <Paperclip size={13} className="-rotate-45" />
                       </button>
                       <input
                         type="file"
@@ -854,16 +844,15 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
                     </>
                   )}
 
-                  {/* Ask / Resolve Persona Toggle (Experimental Ask Mode) */}
-                  {enableAskMode && (
-                    <div className="flex items-center space-x-1 bg-zinc-100 dark:bg-zinc-900/90 p-0.5 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                  {enableAskMode ? (
+                    <div className="flex items-center space-x-0.5 bg-zinc-100 dark:bg-zinc-900 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-800">
                       <button
                         type="button"
                         onClick={() => handleSwitchPersona('ask')}
-                        className={`px-3.5 py-1 rounded-lg text-xs font-mono transition-all ${
+                        className={`px-2.5 py-0.5 rounded-md text-[10.5px] font-mono transition-all cursor-pointer ${
                           persona === 'ask'
-                            ? 'bg-zinc-200/90 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
-                            : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
+                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
+                            : 'text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300'
                         }`}
                       >
                         ask
@@ -871,20 +860,39 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
                       <button
                         type="button"
                         onClick={() => handleSwitchPersona('resolve')}
-                        className={`px-3.5 py-1 rounded-lg text-xs font-mono transition-all ${
+                        className={`px-2.5 py-0.5 rounded-md text-[10.5px] font-mono transition-all cursor-pointer ${
                           persona === 'resolve'
-                            ? 'bg-zinc-200/90 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
-                            : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
+                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
+                            : 'text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300'
                         }`}
                       >
                         resolve
                       </button>
                     </div>
+                  ) : (
+                    <div className="px-2.5 py-0.5 rounded-lg text-[10.5px] font-mono font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 select-none flex items-center">
+                      <span>resolve</span>
+                    </div>
                   )}
                 </div>
+                
+                <button
+                  type="button"
+                  onClick={(e) => handleSubmit(e)}
+                  disabled={!input.trim()}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 rounded-lg hover:opacity-90 disabled:opacity-30 transition-opacity flex-shrink-0"
+                  title="Submit (Enter)"
+                >
+                  <CornerDownLeft size={15} />
+                </button>
+              </form>
 
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-600 font-mono">Press Enter ↵ to submit</span>
-              </div>
+              {/* AI Disclaimer */}
+              <p className="pt-3 text-center text-[10.5px] font-mono text-zinc-400 dark:text-zinc-600 select-none leading-relaxed">
+                AI-generated response based on internal knowledge base only. Verify before use in production actions.
+                <br />
+                Rate this response — your feedback trains better accuracy.
+              </p>
             </div>
 
           </div>
@@ -969,12 +977,12 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
           <div className="py-3 sm:py-4 flex-shrink-0">
             {/* Follow-up Policy Restriction Banner */}
             {!enableChatFollowup && !isLoading && (
-              <div className="mb-2 p-2 rounded-lg bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-zinc-600 dark:text-zinc-400 flex items-center justify-between shadow-2xs">
+              <div className="mb-1.5 py-1 px-2.5 rounded-lg bg-zinc-50/60 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/40 text-[10px] font-mono text-zinc-500 dark:text-zinc-500 flex items-center justify-between">
                 <div className="flex items-center space-x-1.5 min-w-0">
-                  <Lock size={12} className="text-zinc-500 flex-shrink-0" />
+                  <Lock size={11} className="text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
                   <span className="truncate">Single-turn triage active. Follow-ups disabled.</span>
                 </div>
-                <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 font-bold flex-shrink-0 ml-2">
+                <span className="text-[8.5px] px-1.5 py-0.5 rounded bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-300/80 dark:border-zinc-700 font-semibold flex-shrink-0 ml-2">
                   Context Guard
                 </span>
               </div>
@@ -986,7 +994,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
                 if (!enableChatFollowup && messages.length > 0) return;
                 handleSubmit(e); 
               }} 
-              className={`relative flex items-end bg-white dark:bg-[#111114] border rounded-xl shadow-xs transition-all p-1.5 ${
+              className={`relative flex items-center bg-white dark:bg-[#111114] border rounded-xl shadow-xs transition-all p-1.5 ${
                 !enableChatFollowup 
                   ? 'border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-[#0c0c0f]' 
                   : 'border-zinc-300 dark:border-zinc-800 focus-within:border-zinc-500 dark:focus-within:border-zinc-600'
@@ -1011,18 +1019,23 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
                         ? "ask a follow-up process question, table schema, or flow..."
                         : "ask a follow-up question or probe deeper into this incident...")
                 }
-                className={`w-full bg-transparent border-0 py-2 px-2.5 pr-10 text-xs font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 outline-none resize-none custom-scrollbar leading-[1.35rem] ${
+                className={`w-full bg-transparent border-0 py-2 pl-[78px] pr-10 text-xs font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 outline-none resize-none custom-scrollbar leading-[1.35rem] ${
                   !enableChatFollowup && messages.length > 0 ? 'cursor-not-allowed opacity-60' : ''
                 }`}
                 rows={1}
-                style={{ minHeight: '38px', maxHeight: '76px' }}
+                style={{ minHeight: '40px', maxHeight: '100px' }}
               />
+
+              {/* Monochromatic Mode Badge (Bottom-Left) */}
+              <div className="absolute left-2 top-1/2 -translate-y-1/2 px-2.5 py-0.5 rounded-lg text-[10.5px] font-mono font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 select-none flex items-center">
+                <span>{persona === 'ask' ? 'ask' : 'resolve'}</span>
+              </div>
               
               {isLoading ? (
                 <button
                   type="button"
                   onClick={handleStopProcess}
-                  className="absolute right-2 bottom-2 p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs transition-colors flex-shrink-0 flex items-center justify-center"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs transition-colors flex-shrink-0 flex items-center justify-center"
                   title="Stop Process (Abrupt)"
                 >
                   <Square size={13} className="fill-current" />
@@ -1035,7 +1048,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
                     handleSubmit(e);
                   }}
                   disabled={!input.trim() || (!enableChatFollowup && messages.length > 0)}
-                  className="absolute right-2 bottom-2 p-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 rounded hover:opacity-90 disabled:opacity-30 transition-opacity flex-shrink-0"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 rounded hover:opacity-90 disabled:opacity-30 transition-opacity flex-shrink-0"
                   title={!enableChatFollowup && messages.length > 0 ? "Follow-ups disabled" : "Submit (Enter)"}
                 >
                   <CornerDownLeft size={14} />
@@ -1043,23 +1056,12 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
               )}
             </form>
 
-            {/* Active Session Info (No mode switching or file upload during active chat) */}
-            <div className="flex items-center justify-between pt-1.5 px-1 text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
-                <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  {persona === 'ask' ? 'AskProcessAgent' : 'ResolveTriageAgent'}
-                </span>
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-600">
-                  • active session
-                </span>
-              </div>
-              <span className="text-[10px] text-zinc-400 dark:text-zinc-600">
-                {!enableChatFollowup && messages.length > 0
-                  ? "Single-turn policy"
-                  : "Press Enter ↵ to send"}
-              </span>
-            </div>
+            {/* AI Disclaimer */}
+            <p className="pt-2 pb-0.5 text-center text-[10px] font-mono text-zinc-400 dark:text-zinc-600 select-none leading-relaxed">
+              AI-generated response based on internal knowledge base only. Verify before use in production actions.
+              <br />
+              Rate this response — your feedback trains better accuracy.
+            </p>
           </div>
 
         </div>
@@ -1312,35 +1314,47 @@ function ReasoningSection({ reasoning, isEnabled }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-blue-50/60 hover:bg-blue-100/80 dark:bg-blue-950/30 dark:hover:bg-blue-900/40 text-[11px] text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/60 transition-colors cursor-pointer"
+        className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-900/80 dark:hover:bg-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300 border border-zinc-300/80 dark:border-zinc-700 transition-colors cursor-pointer"
       >
-        <BrainCircuit size={13} className="text-blue-500" />
+        <BrainCircuit size={13} className="text-zinc-500 dark:text-zinc-400" />
         <span className="font-semibold">{isOpen ? 'Hide Reasoning' : 'Show Reasoning'}</span>
-        {isOpen ? <ChevronUp size={12} className="text-blue-400" /> : <ChevronDown size={12} className="text-blue-400" />}
+        {isOpen ? <ChevronUp size={12} className="text-zinc-400" /> : <ChevronDown size={12} className="text-zinc-400" />}
       </button>
 
       {isOpen && (
-        <div className="mt-2.5 p-3.5 rounded-xl bg-blue-50/30 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40 text-xs animate-in fade-in slide-in-from-top-1 duration-150">
-          <div className="flex items-center space-x-1.5 text-blue-700 dark:text-blue-300 font-bold text-[11px] mb-3 pb-2 border-b border-blue-200/40 dark:border-blue-900/40">
-            <Sparkles size={12} />
+        <div className="mt-2.5 p-3.5 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800 text-xs animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="flex items-center space-x-1.5 text-zinc-700 dark:text-zinc-300 font-bold text-[11px] mb-3 pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
+            <Sparkles size={12} className="text-zinc-500 dark:text-zinc-400" />
             <span>Multi-Agent Triage Reasoning</span>
           </div>
 
-          <div className="space-y-3.5 pt-0.5">
+          {/* Bullet Point Step-Wise Timeline */}
+          <div className="relative pl-5 space-y-4 pt-1">
+            {/* Vertical Dotted Connector Line (Grey, visible in both dark & light modes) */}
+            <div className="absolute left-[7px] top-2.5 bottom-2.5 w-px border-l-2 border-dotted border-zinc-400/80 dark:border-zinc-500/70 pointer-events-none" />
+
             {blocks.map((block, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="relative group">
+                {/* Category Bullet Dot (Grey, high contrast in both themes) */}
+                <div className="absolute -left-5 top-1 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border-2 border-zinc-500 dark:border-zinc-400 z-10 shadow-2xs">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-600 dark:bg-zinc-300" />
+                </div>
+
+                {/* Main Category Header */}
                 {block.title && (
-                  <div className="text-xs font-bold text-blue-900 dark:text-blue-200">
+                  <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 pl-1">
                     {block.title}
                   </div>
                 )}
-                <div className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+
+                {/* Indented Reasoning Lines */}
+                <div className="pl-3.5 pt-0.5 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                      p: ({ children }) => <p className="mb-1.5 last:mb-0 leading-relaxed">{children}</p>,
                       code: ({ children }) => (
-                        <code className="px-1.5 py-0.5 rounded bg-blue-100/70 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-[10.5px] font-mono border border-blue-200/50 dark:border-blue-800/50">
+                        <code className="px-1.5 py-0.5 rounded bg-zinc-200/70 dark:bg-zinc-800/70 text-zinc-800 dark:text-zinc-200 text-[10.5px] font-mono border border-zinc-300/60 dark:border-zinc-700/60">
                           {children}
                         </code>
                       )
@@ -1366,7 +1380,7 @@ function renderItemBadge(item) {
   return (
     <span 
       key={name} 
-      className="px-1.5 py-0.5 rounded-full text-[8.5px] font-medium bg-zinc-100 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-300 border border-zinc-400 dark:border-zinc-600 flex items-center space-x-1 shadow-2xs"
+      className="px-1.5 py-0.5 rounded-full text-[8.5px] font-medium bg-transparent text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 flex items-center space-x-1"
       title={`${type.toUpperCase()}: ${name}`}
     >
       <span className="opacity-60 text-[7.5px] uppercase font-bold">{prefix}</span>
@@ -1384,6 +1398,10 @@ function SequentialStepPrinter({ step, idx, isCurrent, isCompleted }) {
       setActiveLine(0);
     }
   }, [isCurrent]);
+
+  const stepLatencySec = (step.latency_ms !== undefined && step.latency_ms !== null)
+    ? `${(step.latency_ms / 1000).toFixed(2)}s`
+    : null;
 
   return (
     <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
@@ -1411,6 +1429,13 @@ function SequentialStepPrinter({ step, idx, isCurrent, isCompleted }) {
             {step.agent}
           </span>
         </div>
+
+        {/* Individual Step Time (Plaintext, lower contrast) */}
+        {stepLatencySec && (
+          <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono ml-2 flex-shrink-0">
+            {stepLatencySec}
+          </span>
+        )}
       </div>
 
       {/* Tools, Skills & SOPs Tags (Uniform Grey Rounded) */}
@@ -1449,6 +1474,16 @@ function SequentialStepPrinter({ step, idx, isCurrent, isCompleted }) {
 }
 
 function LiveHierarchicalTimeline({ steps, onStop }) {
+  const [elapsedSeconds, setElapsedSeconds] = useState('0.00');
+
+  useEffect(() => {
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      setElapsedSeconds(((Date.now() - startTime) / 1000).toFixed(2));
+    }, 100);
+    return () => clearInterval(timer);
+  }, []);
+
   const displaySteps = steps && steps.length > 0 ? steps : [
     { step_number: 1, agent: "ContextManagementAgent", title: "Session Context & Multi-Turn Policy Guard", status: "running" }
   ];
@@ -1462,8 +1497,8 @@ function LiveHierarchicalTimeline({ steps, onStop }) {
           <span className="font-bold text-zinc-700 dark:text-zinc-300 text-xs">
             Multi-Agent Real-Time Execution
           </span>
-          <span className="px-2 py-0.5 rounded-full text-[9px] bg-zinc-100 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-300 font-semibold border border-zinc-400 dark:border-zinc-600 shadow-2xs">
-            Live Stream
+          <span className="text-[10.5px] text-zinc-500 dark:text-zinc-400 font-mono font-medium">
+            • {elapsedSeconds}s
           </span>
         </div>
         
@@ -1538,7 +1573,9 @@ function CollapsedExecutionTimeline({ traces, latencyMs }) {
           <div className="mt-2.5 pt-2.5 border-t border-zinc-200/30 dark:border-zinc-800/30 space-y-3 pl-3.5 relative border-l-2 border-zinc-200/40 dark:border-zinc-800/40 ml-1 animate-in fade-in duration-150">
             {activeTraces.map((trace, idx) => {
               const enriched = getEnrichedStep(trace);
-              const traceLatency = trace.latency_ms ? `${trace.latency_ms}ms` : null;
+              const traceSeconds = (trace.latency_ms !== undefined && trace.latency_ms !== null)
+                ? `${(trace.latency_ms / 1000).toFixed(2)}s`
+                : null;
               const isPiiMasked = trace.agent === 'PIISanitizerAgent' && trace.stage === 'inbound' && trace.result?.has_pii;
               const isPiiRestored = trace.agent === 'PIISanitizerAgent' && trace.stage === 'outbound' && trace.result?.has_pii;
               const intentResult = trace.result?.intent;
@@ -1590,9 +1627,9 @@ function CollapsedExecutionTimeline({ traces, latencyMs }) {
                           {trace.result.tier2_valid ? 'AST PASS' : 'AST FAIL'}
                         </span>
                       )}
-                      {traceLatency && (
-                        <span className="text-[10px] text-zinc-400 font-mono ml-1">
-                          {traceLatency}
+                      {traceSeconds && (
+                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono ml-1.5 flex-shrink-0">
+                          {traceSeconds}
                         </span>
                       )}
                     </div>
