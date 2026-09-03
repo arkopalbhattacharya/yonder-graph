@@ -81,7 +81,7 @@ export default function InvestigationStepper({ steps, sessionId }) {
     <div className="my-3.5 font-mono">
       <div className="text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold mb-2.5 flex items-center space-x-1.5">
         <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-        <span>Ordered Investigation Steps</span>
+        <span>Investigation Steps</span>
       </div>
 
       <div className="relative pl-6 space-y-4">
@@ -116,7 +116,7 @@ export default function InvestigationStepper({ steps, sessionId }) {
               {/* Per-Step Diagnostic SQL */}
               {step.diagnostic_sql && (
                 <div className="pt-1.5">
-                  <CodeCard 
+                  <CodeCard
                     title={`Diagnostic SQL — Step ${step.step_number || idx + 1}`}
                     code={step.diagnostic_sql}
                     language="sql"
@@ -158,11 +158,10 @@ export default function InvestigationStepper({ steps, sessionId }) {
                 <div className="flex items-center space-x-1.5 shrink-0">
                   <button
                     onClick={() => setIsWordWrap(!isWordWrap)}
-                    className={`p-1 rounded text-[10px] flex items-center space-x-1 px-2 transition-colors cursor-pointer ${
-                      isWordWrap
+                    className={`p-1 rounded text-[10px] flex items-center space-x-1 px-2 transition-colors cursor-pointer ${isWordWrap
                         ? 'bg-blue-600/40 text-blue-300 border border-blue-500/50 font-bold'
                         : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
-                    }`}
+                      }`}
                     title={isWordWrap ? "Disable Text Wrap" : "Enable Text Wrap"}
                   >
                     <WrapText size={11} className={isWordWrap ? "text-blue-400" : "text-zinc-400"} />

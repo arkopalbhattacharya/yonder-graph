@@ -36,6 +36,17 @@ class TestIntentClassifierGuardrails(unittest.TestCase):
         res = self.orchestrator._classify_intent("Order ORD123 is stuck in Planned status at WH01", session_id="test-session")
         self.assertEqual(res.get("intent"), "INCIDENT_TRIAGE")
 
+    def test_inbound_integration_error_triage_query(self):
+        query = "We're seeing ERR_INVALID_VENDOR_CODE on an inbound PO integration message, trans_id 55901 — how do I diagnose it?"
+        res = self.orchestrator._classify_intent(query, session_id="test-session")
+        self.assertEqual(res.get("intent"), "INCIDENT_TRIAGE")
+        self.assertEqual(res.get("domain"), "Inbound")
+
+    def test_diagnostic_error_code_triage_query(self):
+        query = "How to troubleshoot ERR_ALLOC_FAILED on wave WAV9982"
+        res = self.orchestrator._classify_intent(query, session_id="test-session")
+        self.assertEqual(res.get("intent"), "INCIDENT_TRIAGE")
+
     @patch("backend.inference.orchestrator.pii_engine.sanitize_text")
     def test_run_triage_out_of_scope_execution(self, mock_pii):
         mock_pii.return_value = {
