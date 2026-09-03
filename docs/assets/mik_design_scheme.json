@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "MIK Design Scheme for Yonder Graph",
+  "version": "1.0.0",
+  "source": {
+    "brand": "Michaels",
+    "url": "https://www.michaels.com/"
+  },
+  "description": "Enterprise UI color tokens and design schemes for Yonder Graph adapted from Michaels Arts & Crafts brand palette.",
+  "schemes": {
+    "light": {
+      "id": "mik-light",
+      "displayName": "MIK Studio Light",
+      "type": "light",
+      "tokens": {
+        "surface": {
+          "canvas": "#F8F8F9",
+          "panel": "#FFFFFF",
+          "subtle": "#F2F2F4",
+          "hover": "#EAEAEF",
+          "active": "#E2E2EA"
+        },
+        "border": {
+          "subtle": "#EAEAEA",
+          "default": "#E5E7EB",
+          "strong": "#D1D5DB"
+        },
+        "text": {
+          "primary": "#1B1B1B",
+          "secondary": "#5F5F5F",
+          "muted": "#757575",
+          "inverse": "#FFFFFF"
+        },
+        "brand": {
+          "primary": "#CF1F2E",
+          "hover": "#B71825",
+          "active": "#9B2C2C",
+          "light": "#F8D2CB",
+          "glow": "rgba(207, 31, 46, 0.15)"
+        },
+        "semantics": {
+          "success": {
+            "text": "#00856D",
+            "bg": "#ECF6F4",
+            "border": "#A7E0D6"
+          },
+          "warning": {
+            "text": "#A85D00",
+            "bg": "#FFF2DF",
+            "border": "#FBD38D"
+          },
+          "error": {
+            "text": "#EB003B",
+            "bg": "#FEF5F8",
+            "border": "#FEB2B2"
+          },
+          "info": {
+            "text": "#0475BC",
+            "bg": "#EFF7FB",
+            "border": "#BEE3F8"
+          }
+        },
+        "components": {
+          "sidebar": {
+            "bg": "#FFFFFF",
+            "border": "#EAEAEA",
+            "activeItemBg": "#FEF1EF",
+            "activeItemText": "#CF1F2E"
+          },
+          "header": {
+            "bg": "rgba(255, 255, 255, 0.85)",
+            "border": "#EAEAEA"
+          },
+          "button": {
+            "primaryBg": "#CF1F2E",
+            "primaryText": "#FFFFFF",
+            "primaryHover": "#B71825",
+            "secondaryBg": "#F2F2F4",
+            "secondaryText": "#1B1B1B",
+            "secondaryBorder": "#E5E7EB"
+          },
+          "code": {
+            "bg": "#18181B",
+            "text": "#F4F4F5",
+            "border": "#27272A"
+          }
+        }
+      }
+    },
+    "dark": {
+      "id": "mik-dark",
+      "displayName": "MIK Craft Carbon Dark",
+      "type": "dark",
+      "tokens": {
+        "surface": {
+          "canvas": "#0F0F12",
+          "panel": "#18181C",
+          "subtle": "#222227",
+          "hover": "#2A2A31",
+          "active": "#32323B"
+        },
+        "border": {
+          "subtle": "#222227",
+          "default": "#2D2D35",
+          "strong": "#3F3F4B"
+        },
+        "text": {
+          "primary": "#F5F5F7",
+          "secondary": "#9E9EA8",
+          "muted": "#75757F",
+          "inverse": "#111114"
+        },
+        "brand": {
+          "primary": "#E53E3E",
+          "hover": "#FF5A65",
+          "active": "#C53030",
+          "light": "#3A1418",
+          "glow": "rgba(229, 62, 62, 0.25)"
+        },
+        "semantics": {
+          "success": {
+            "text": "#34D399",
+            "bg": "rgba(0, 149, 109, 0.15)",
+            "border": "rgba(52, 211, 153, 0.3)"
+          },
+          "warning": {
+            "text": "#FBBF24",
+            "bg": "rgba(235, 171, 51, 0.15)",
+            "border": "rgba(251, 191, 36, 0.3)"
+          },
+          "error": {
+            "text": "#F87171",
+            "bg": "rgba(235, 0, 59, 0.15)",
+            "border": "rgba(248, 113, 113, 0.3)"
+          },
+          "info": {
+            "text": "#38BDF8",
+            "bg": "rgba(4, 117, 188, 0.15)",
+            "border": "rgba(56, 189, 248, 0.3)"
+          }
+        },
+        "components": {
+          "sidebar": {
+            "bg": "#141418",
+            "border": "#222227",
+            "activeItemBg": "rgba(207, 31, 46, 0.15)",
+            "activeItemText": "#FF6B72"
+          },
+          "header": {
+            "bg": "rgba(24, 24, 28, 0.85)",
+            "border": "#2D2D35"
+          },
+          "button": {
+            "primaryBg": "#CF1F2E",
+            "primaryText": "#FFFFFF",
+            "primaryHover": "#E53E3E",
+            "secondaryBg": "#222227",
+            "secondaryText": "#E5E5EA",
+            "secondaryBorder": "#2D2D35"
+          },
+          "code": {
+            "bg": "#09090B",
+            "text": "#EDEDED",
+            "border": "#222227"
+          }
+        }
+      }
+    }
+  },
+  "graph_taxonomy": {
+    "Domain": {
+      "sourceToken": "secondary-3 (Teal)",
+      "light": "#009783",
+      "dark": "#14B8A6",
+      "description": "Top-level domain knowledge cluster"
+    },
+    "Table": {
+      "sourceToken": "secondary-4 (Studio Blue)",
+      "light": "#0475BC",
+      "dark": "#38BDF8",
+      "description": "Relational entities and database tables"
+    },
+    "Column": {
+      "sourceToken": "peach-500 (Coral/Peach)",
+      "light": "#ED7064",
+      "dark": "#FB7185",
+      "description": "Entity attributes and column schema definitions"
+    },
+    "SOPRunbook": {
+      "sourceToken": "secondary-2 (Gold/Amber)",
+      "light": "#D97706",
+      "dark": "#FBBF24",
+      "description": "Standard operating runbooks and automated remediation"
+    },
+    "BYConfig": {
+      "sourceToken": "primary-default (Michaels Red)",
+      "light": "#CF1F2E",
+      "dark": "#F87171",
+      "description": "Blue Yonder configuration settings and critical triggers"
+    },
+    "BusinessFlow": {
+      "sourceToken": "gray-500 (Slate)",
+      "light": "#757575",
+      "dark": "#94A3B8",
+      "description": "End-to-end business logic and workflows"
+    },
+    "BusinessTerm": {
+      "sourceToken": "gray-600 (Dark Slate)",
+      "light": "#5F5F5F",
+      "dark": "#64748B",
+      "description": "Domain glossaries and definitions"
+    }
+  }
+}

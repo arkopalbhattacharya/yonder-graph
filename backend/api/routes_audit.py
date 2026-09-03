@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import Optional
 from sqlalchemy.orm import Session
 from backend.database.postgres_client import get_db
-from backend.audit.models import AgentAuditLog
+from backend.audit.models import AgentAuditLog, ChatMessage
 from backend.audit.feedback_logger import feedback_logger
 from backend.inference.telemetry import telemetry
 from backend.inference.llm_provider import LLMProviderFactory
@@ -77,6 +77,29 @@ def get_audit_stats(db: Session = Depends(get_db)):
         db_prompt_tokens = int(db_total_tokens * 0.70) if db_total_tokens > 0 else 0
         db_completion_tokens = db_total_tokens - db_prompt_tokens
 
+        # Lifetime total user queries from PostgreSQL DB
+        try:
+            db_total_queries = db.query(func.count(ChatMessage.id)).filter(ChatMessage.role == 'user').scalar() or 0
+            if db_total_queries > 0:
+                metrics["total_queries"] = max(metrics.get("total_queries", 0), int(db_total_queries))
+        except Exception:
+            pass
+
+        # Lifetime total agent invocations from PostgreSQL DB
+        db_agent_counts = {}
+        try:
+            db_total_invocations = db.query(func.count(AgentAuditLog.id)).scalar() or 0
+            if db_total_invocations > 0:
+                metrics["total_invocations"] = max(metrics.get("total_invocations", 0), int(db_total_invocations))
+            
+            agent_count_rows = db.query(
+                AgentAuditLog.agent_name,
+                func.count(AgentAuditLog.id)
+            ).group_by(AgentAuditLog.agent_name).all()
+            db_agent_counts = {row[0]: int(row[1] or 0) for row in agent_count_rows}
+        except Exception:
+            pass
+
         # Lifetime per-agent tokens from PostgreSQL DB
         agent_token_rows = db.query(
             AgentAuditLog.agent_name,
@@ -111,11 +134,16 @@ def get_audit_stats(db: Session = Depends(get_db)):
                     "error_rate": 0,
                     "last_invocation": None,
                 }
+            if ag_name in db_agent_counts:
+                metrics["agents"][ag_name]["invocation_count"] = max(
+                    metrics["agents"][ag_name].get("invocation_count", 0),
+                    db_agent_counts[ag_name]
+                )
 
         for agent_name, token_count in db_agent_tokens.items():
             if agent_name not in metrics["agents"]:
                 metrics["agents"][agent_name] = {
-                    "invocation_count": 0,
+                    "invocation_count": db_agent_counts.get(agent_name, 0),
                     "success_count": 0,
                     "error_count": 0,
                     "total_tokens": 0,
@@ -144,6 +172,13 @@ def get_audit_stats(db: Session = Depends(get_db)):
             metrics["agents"][agent_name]["completion_tokens"] = max(
                 metrics["agents"][agent_name].get("completion_tokens", 0),
                 token_count - ag_p
+            )
+
+        # Recalculate total_invocations from merged per-agent counts
+        if metrics["agents"]:
+            metrics["total_invocations"] = max(
+                metrics.get("total_invocations", 0),
+                sum(m.get("invocation_count", 0) for m in metrics["agents"].values())
             )
 
         # Governance intercept count from persistent PostgreSQL audit logs

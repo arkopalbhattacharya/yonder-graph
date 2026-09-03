@@ -191,10 +191,10 @@ export default function GraphVisualizer({ isActive }) {
     const colors = {
       Domain: '#10b981',       // Emerald
       Table: '#3b82f6',        // Blue
-      Column: '#0ea5e9',       // Sky Blue
-      SOPRunbook: '#8b5cf6',   // Purple
-      BusinessFlow: '#f59e0b', // Amber
-      BusinessTerm: '#ec4899', // Pink
+      Column: '#ec4899',       // Pink (same as previous business term color)
+      SOPRunbook: '#eab308',   // Yellow
+      BusinessFlow: '#94a3b8', // Slate Grey (Light)
+      BusinessTerm: '#64748b', // Slate Grey (Medium/Dark)
       BYConfig: '#ef4444'      // Red
     };
     return colors[node.label] || '#64748b';
@@ -781,13 +781,13 @@ export default function GraphVisualizer({ isActive }) {
 
               {nodeHierarchy?.referencedSops?.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="text-[10px] uppercase font-bold text-purple-600 dark:text-purple-400 tracking-wider">Registered SOP Runbooks ({nodeHierarchy.referencedSops.length})</span>
+                  <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 tracking-wider">Registered SOP Runbooks ({nodeHierarchy.referencedSops.length})</span>
                   <div className="flex flex-wrap gap-1 max-h-36 overflow-y-auto custom-scrollbar">
                     {nodeHierarchy.referencedSops.map(sop => (
                       <span 
                         key={sop.id} 
                         onClick={() => handleFocusNode(sop)}
-                        className="px-2 py-1 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 font-bold text-[10px] cursor-pointer hover:bg-purple-100 transition-colors"
+                        className="px-2 py-1 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 font-bold text-[10px] cursor-pointer hover:bg-amber-100 transition-colors"
                       >
                         {sop.name}
                       </span>
@@ -811,10 +811,10 @@ export default function GraphVisualizer({ isActive }) {
             {[
               { label: 'Domain', color: '#10b981' },
               { label: 'Table', color: '#3b82f6' },
-              { label: 'Column', color: '#0ea5e9' },
-              { label: 'SOP Runbook', color: '#8b5cf6' },
-              { label: 'Business Flow', color: '#f59e0b' },
-              { label: 'Business Term', color: '#ec4899' },
+              { label: 'Column', color: '#ec4899' },
+              { label: 'SOP Runbook', color: '#eab308' },
+              { label: 'Business Flow', color: '#94a3b8' },
+              { label: 'Business Term', color: '#64748b' },
             ].map(item => (
               <div key={item.label} className="flex items-center space-x-1.5">
                 <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />

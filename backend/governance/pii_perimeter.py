@@ -206,6 +206,9 @@ class PIIPerimeterEngine:
                         continue
                     if overlaps_with_det(start, end):
                         continue
+                    # Ignore WMS operational facilities, warehouses, docks, and location codes
+                    if re.match(r'^(?:warehouse|wh|building|bldg|dock|door|bay|aisle|loc|location|slot|zone|facility|plant|hub|terminal|dc)\s*#?\s*\w+$', ent_text, re.IGNORECASE):
+                        continue
                     t_type = "NAME" if ("name" in ent_label or "person" in ent_label) else "ADDRESS"
                     ner_spans.append((start, end, t_type, ent_text))
             except Exception as e:

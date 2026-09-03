@@ -78,7 +78,8 @@ class TriageOrchestrator:
         Intent Pathway 2: INCIDENT_TRIAGE -> DiagnosticTriagePipeline (SOP -> SQL -> AST -> Tier 1 Governance)
         """
         session_id = session_id or str(uuid.uuid4())
-        telemetry.record_session()
+        telemetry.record_session(session_id=session_id)
+        telemetry.record_query(session_id=session_id)
         
         pipeline_start = time.perf_counter()
         agent_traces: List[Dict[str, Any]] = []
@@ -396,7 +397,8 @@ class TriageOrchestrator:
         Yields JSON-formatted event dicts for the frontend consumer.
         """
         session_id = session_id or str(uuid.uuid4())
-        telemetry.record_session()
+        telemetry.record_session(session_id=session_id)
+        telemetry.record_query(session_id=session_id)
         pipeline_start = time.perf_counter()
         agent_traces: List[Dict[str, Any]] = []
 
@@ -842,18 +844,35 @@ class TriageOrchestrator:
         if q_clean in greeting_words or len(q_clean) <= 2:
             return {"intent": "GREETING", "domain": "general", "topic": "greeting", "_prompt_tokens": 10, "_completion_tokens": 5}
 
-        # ── Deterministic Fast-Path for General Supply Chain Process Inquiries ──
-        sc_keywords = ["order", "outbound", "waving", "wave", "pick", "ship", "shipment", "allocat", "inbound", "receive", "receiving", "trailer", "dock", "asn", "inventory", "hold", "lpn", "location", "sku", "cycle count", "count", "moca", "ordnum", "lodnum", "schema", "table", "column"]
+        # ── Deterministic Fast-Path for Pure Conceptual Process Inquiries ──
+        sc_keywords = [
+            "order", "outbound", "waving", "wave", "pick", "ship", "shipment", "allocat",
+            "inbound", "receive", "receiving", "trailer", "dock", "asn", "inventory", "hold",
+            "lpn", "location", "sku", "cycle count", "count", "moca", "ordnum", "lodnum",
+            "schema", "table", "column", "po", "integration", "vendor", "transaction", "message",
+            "receipt", "putaway", "staging", "dispatch", "manifest"
+        ]
         has_sc_context = any(w in q_clean for w in sc_keywords)
 
-        incident_indicators = re.search(r'\b(stuck|fail|error|deadlock|alert|delay|slow|hold|blocked|issue|bug|problem|wrong|discrepancy|investigate|why is|ord-\d+|wh-\d+|lpn-\d+|rcv-\d+|ordnum|lodnum|wh_id|wave_num)\b', q_clean)
-        flow_indicators = re.search(r'\b(show|explain|describe|tell|walk|give|what is|how does|what are|overview|nutshell|lifecycle|workflow|process flow|order flow|inbound flow|outbound flow|inventory flow|receiving flow|shipping flow|table schema|architecture|how do|how to|steps for)\b', q_clean)
+        # Detect any specific business identifiers (e.g., SKU 44210, Store 1120, trans_id 55901, ORD123)
+        has_specific_identifiers = bool(re.search(r'(\b\d{3,}\b|\b[a-zA-Z]{1,6}[-_]?\d+\b|\b\d+[-_]?[a-zA-Z]{1,6}\b|\btrans(?:action)?[_\s-]*id\b|\bsku\b|\bstore\b|\blocation\b|\btrans_id\b|\btrx_id\b|\bpo_num\b|\blodnum\b|\bordnum\b|\blpn\b)', q_clean))
 
-        if flow_indicators and has_sc_context and not incident_indicators:
+        incident_indicators = re.search(
+            r'(\berr[_\w-]*|\berror[s]?\b|\bexception[s]?\b|\bfail\w*|\bflag\w*|\bdelta\b|\bvarianc\w*|\bshortage[s]?\b|\boverage[s]?\b|\bshrink\w*|\breconcil\w*|\bescalat\w*|\bl[123]\b|\binvalid[_\w-]*|\breject\w*|\bdeadlock[s]?\b|\btimeout[s]?\b|\bstuck\b|\bhang[s]?\b|\bdelay[s]?\b|\bslow\b|\bhold[s]?\b|\bblocked?\b|\bissue[s]?\b|\bbug[s]?\b|\bproblem[s]?\b|\bwrong\b|\bdiscrepan\w*|\bmismatch\w*|\banomal\w*|\bcorrupt\w*|\bdiagnos\w*|\btroubleshoot\w*|\btriage\w*|\bdebug\w*|\brca\b|\broot cause\b|\bfix\w*|\binvestigat\w*|\bwhy is\b|\bwhy did\b|\bwhat caused\b|\bwhat is holding\b|\bwhat\'?s holding\b|\bwhat could\b|\bwhat can it be\b|\bwhat might\b)',
+            q_clean
+        )
+        
+        # Only purely generic flow questions without specific identifiers or incident signals get fast-pathed
+        flow_indicators = re.search(
+            r'^(show|explain|describe|tell me about|what is|how does|what are|overview|architecture of)\b.*\b(process flow|order flow|inbound flow|outbound flow|inventory flow|receiving flow|shipping flow|table schema|architecture|lifecycle|wms)\b',
+            q_clean
+        )
+
+        if flow_indicators and has_sc_context and not incident_indicators and not has_specific_identifiers:
             domain = "general"
-            if any(w in q_clean for w in ["order", "outbound", "waving", "wave", "pick", "ship", "allocat"]):
+            if any(w in q_clean for w in ["order", "outbound", "waving", "wave", "pick", "ship", "allocat", "dispatch"]):
                 domain = "Outbound"
-            elif any(w in q_clean for w in ["inbound", "receive", "receiving", "trailer", "dock", "asn"]):
+            elif any(w in q_clean for w in ["inbound", "receive", "receiving", "trailer", "dock", "asn", "po", "vendor"]):
                 domain = "Inbound"
             elif any(w in q_clean for w in ["inventory", "hold", "lpn", "location", "sku", "cycle count", "count"]):
                 domain = "Inventory"
@@ -870,9 +889,11 @@ You are the Intent Recognition Agent for the Yonder Graph Supply Chain platform.
 Analyze this user query: "{query}"
 
 Classify into one of THREE operational categories:
-1. "GENERAL_PROCESS_INQUIRY": The user is asking conceptual, educational, status/schema verification, or architectural questions about supply chain flows, warehouse lifecycles, database table mappings, or operational procedures (e.g. "show me the order flow", "explain inbound flow", "what is outbound", "how does waving work", "how to check order status", "where is inventory stored", "what is MOCA").
-2. "INCIDENT_TRIAGE": The user is reporting, describing, or investigating a specific supply chain production defect, stuck transaction, allocation lock, warehouse error, hold, or data discrepancy (e.g. "Order ORD123 is stuck in Planned", "Inventory hold on LPN 5002", "Wave allocation failed at WH01", "Trailer 8812 allocation locked").
-3. "OUT_OF_SCOPE": The query is NOT related to supply chain, warehouse management systems (WMS), logistics, inventory, orders, shipments, waving, picking, staging, loading, receiving, MOCA, or database operations (e.g. questions about weather, food/recipes, sports, general politics/celebrities, travel, unrelated math/coding, or general chit-chat).
+1. "GENERAL_PROCESS_INQUIRY": The user is asking purely generic, conceptual, educational, or architectural questions about general supply chain flows or table schemas WITHOUT any specific incident context, entity IDs, or issue details (e.g. "show me the order flow", "explain inbound flow", "what is outbound waving", "how does allocation work conceptually", "table schema for ORD", "what is MOCA").
+2. "INCIDENT_TRIAGE": The user is reporting, describing, investigating, diagnosing, or troubleshooting an actual issue, error, stuck state, lock, hold, delta, or discrepancy. 
+   CRITICAL DISAMBIGUATION RULE:
+   - If the query mentions specific entity IDs or details (e.g. Store numbers, SKU codes, Order IDs, Wave numbers, LPNs, Trailer IDs, transaction IDs, quantities, or error codes) OR asks "walk me through diagnosing it", "what can it be", "what is holding it", "how do I fix it", or "reconciliation before escalation", it is ALWAYS "INCIDENT_TRIAGE", NOT a general inquiry!
+3. "OUT_OF_SCOPE": The query is NOT related to supply chain, warehouse management systems (WMS), logistics, inventory, orders, shipments, waving, picking, staging, loading, receiving, MOCA, or database operations (e.g. weather, recipes, sports, general chit-chat).
 
 Assign the domain: "Inbound", "Outbound", "Inventory", "general", or "unrelated".
 
@@ -1500,6 +1521,15 @@ Return ONLY a valid JSON object:
             "latency_ms": round(t5.elapsed_ms, 2),
             "result": {"step_count": len(inv_steps)},
         })
+        telemetry.record_invocation(
+            "ResolveTriageAgent",
+            t5.elapsed_ms,
+            tokens_used=120,
+            prompt_tokens=80,
+            completion_tokens=40,
+            success=True,
+            session_id=session_id,
+        )
 
         # ── Step 6: Multi-Persona Narrative & Diagnostic Reasoning (HumanizingAgent) ──
         with AuditTimer() as t6:
@@ -1855,6 +1885,15 @@ Return ONLY valid JSON array:
         lodnum_match = re.search(r"(?:lodnum|lpn|load)\s*[=:]\s*([A-Za-z0-9\-_]+)", query, re.IGNORECASE)
         if lodnum_match:
             business_keys["lodnum"] = lodnum_match.group(1)
+        trans_match = re.search(r"(?:trans_id|trx_id|transaction_id|trans)\s*[=:\s]\s*([A-Za-z0-9\-_]+)", query, re.IGNORECASE)
+        if trans_match:
+            business_keys["trans_id"] = trans_match.group(1)
+        po_match = re.search(r"(?:po_num|ponum|po)\s*[=:\s]\s*([A-Za-z0-9\-_]+)", query, re.IGNORECASE)
+        if po_match:
+            business_keys["po_num"] = po_match.group(1)
+        err_match = re.search(r"\b(ERR_[A-Za-z0-9_]+)\b", query)
+        if err_match:
+            business_keys["error_code"] = err_match.group(1)
 
         return {
             "domain": domain,
@@ -2040,14 +2079,14 @@ CRITICAL TASKS:
 2. "l2_summary": Functional & technical triage summary tailored for L2 Application Support Engineers. Detail affected WMS tables (ORD, ORD_LINE, INVLOD), transaction state mismatches (e.g. allocation hold, lock contention), diagnostic findings, and operational checks.
 3. "l3_summary": Deep architectural & DBA summary tailored for L3 Core Engineers & DBAs. Detail Oracle table constraints, pessimistic locking flags, parameter bind sanitization, AST read-only validation status, ROWNUM <= 100 boundaries, and Four-Tier governance compliance.
 4. "narrative": General summary (defaulting to L1/L2 balanced overview).
-5. "reasoning": Comprehensive multi-agent triage reasoning chain explaining cognitive decisions. Format strictly into clean, readable paragraphs with clear double newlines between distinct sections:
-   - 🎯 **Intent & Domain Classification**: Paragraph explaining why this query was classified as an operational incident in the {domain} domain.
+5. "reasoning": Multi-agent triage reasoning chain explaining cognitive decisions. For each distinct category below, provide a concise summary of 3 to 4 sentences (formatted with double newlines between categories):
+   - 🎯 **Intent & Domain Classification**: 3-4 sentences explaining why this query was classified as an operational incident in the {domain} domain.
    
-   - 📖 **Knowledge Base & SOP Selection**: Paragraph explaining why SOP {matched_sop.get('sop_id', 'standard diagnostic') if matched_sop else 'standard diagnostic'} was retrieved and how it addresses the root cause.
+   - 📖 **Knowledge Base & SOP Selection**: 3-4 sentences explaining why SOP {matched_sop.get('sop_id', 'standard diagnostic') if matched_sop else 'standard diagnostic'} was retrieved and how it addresses the root cause.
    
-   - 🛡️ **SQL & AST Guard Enforcement**: Paragraph explaining how business parameters were sanitized and how Tier 2 AST read-only validation ensured zero database mutation.
+   - 🛡️ **SQL & AST Guard Enforcement**: 3-4 sentences explaining how business parameters were sanitized and how Tier 2 AST read-only validation ensured zero database mutation.
    
-   - ⚖️ **Governance & Safety Policy**: Paragraph explaining why the risk tier ({governance_result.get('risk_level', 'LOW_RISK_READONLY') if governance_result else 'LOW_RISK_READONLY'}) was assigned and what preconditions/rollback procedures apply.
+   - ⚖️ **Governance & Safety Policy**: 3-4 sentences explaining why the risk tier ({governance_result.get('risk_level', 'LOW_RISK_READONLY') if governance_result else 'LOW_RISK_READONLY'}) was assigned and what preconditions/rollback procedures apply.
 6. "sql_reasoning": Short concise explanation of the diagnostic SQL query.
 
 Return ONLY a valid JSON object:
