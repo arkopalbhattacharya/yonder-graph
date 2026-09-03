@@ -52,7 +52,7 @@ export default function MermaidDiagram({ chart }) {
         background: '#0e0e11',
         primaryColor: '#18181b',
         primaryTextColor: '#f4f4f5',
-        primaryBorderColor: '#3b82f6',
+        primaryBorderColor: '#F87171',
         lineColor: '#52525b',
         secondaryColor: '#18181b',
         tertiaryColor: '#121214',
@@ -60,7 +60,7 @@ export default function MermaidDiagram({ chart }) {
         background: '#f8fafc',
         primaryColor: '#ffffff',
         primaryTextColor: '#0f172a',
-        primaryBorderColor: '#3b82f6',
+        primaryBorderColor: '#CF1F2E',
         lineColor: '#64748b',
       },
       securityLevel: 'loose',
@@ -169,7 +169,7 @@ export default function MermaidDiagram({ chart }) {
         {/* Header Toolbar */}
         <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-100/90 dark:bg-[#121215]/90 text-[11px]">
           <div className="flex items-center space-x-1.5 text-zinc-500 dark:text-zinc-400">
-            <Code size={12} className="text-blue-500" />
+            <Code size={12} className="text-[#CF1F2E]" />
             <span className="font-semibold text-[10px] uppercase tracking-wider">Flowchart Architecture</span>
           </div>
 
@@ -200,7 +200,7 @@ export default function MermaidDiagram({ chart }) {
                     onClick={downloadCode}
                     className="w-full text-left px-3 py-1.5 flex items-center space-x-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors"
                   >
-                    <FileCode size={12} className="text-blue-500" />
+                    <FileCode size={12} className="text-[#CF1F2E]" />
                     <span>Download Code (.mmd)</span>
                   </button>
                   <button
@@ -243,7 +243,7 @@ export default function MermaidDiagram({ chart }) {
             {/* Modal Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#121215]">
               <div className="flex items-center space-x-2">
-                <Code size={14} className="text-blue-500" />
+                <Code size={14} className="text-[#CF1F2E]" />
                 <span className="font-semibold text-xs text-zinc-800 dark:text-zinc-200">
                   Process Architecture Flowchart (Full View)
                 </span>

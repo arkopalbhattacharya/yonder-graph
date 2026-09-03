@@ -9,7 +9,7 @@
   }
 
   body {
-    @apply bg-surface-light text-text-primary-light font-mono antialiased selection:bg-blue-500/20 selection:text-blue-500;
+    @apply bg-surface-light text-text-primary-light font-mono antialiased selection:bg-[#CF1F2E]/20 selection:text-[#CF1F2E];
   }
   
   .dark body {
@@ -33,19 +33,19 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800/80;
+    @apply bg-white/85 dark:bg-[#18181C]/85 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800/80;
   }
   
   .btn-primary {
-    @apply px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 text-xs font-mono font-medium rounded-md transition-all shadow-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply px-3.5 py-1.5 bg-[#CF1F2E] hover:bg-[#B71825] active:bg-[#9B2C2C] dark:bg-[#CF1F2E] dark:hover:bg-[#E53E3E] text-white text-xs font-mono font-medium rounded-md transition-all shadow-sm focus:outline-none focus:ring-1 focus:ring-[#CF1F2E] disabled:opacity-40 disabled:cursor-not-allowed;
   }
   
   .btn-secondary {
-    @apply px-3.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-mono font-medium rounded-md transition-all border border-zinc-200 dark:border-zinc-800 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply px-3.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-mono font-medium rounded-md transition-all border border-zinc-200 dark:border-zinc-700 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed;
   }
   
   .card {
-    @apply bg-panel-light dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800/80 shadow-none overflow-hidden;
+    @apply bg-panel-light dark:bg-panel-dark rounded-lg border border-zinc-200 dark:border-zinc-800/80 shadow-none overflow-hidden;
   }
   
   .badge {
@@ -53,11 +53,11 @@
   }
   
   .badge-blue {
-    @apply bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20;
+    @apply bg-[#0475BC]/10 text-[#0475BC] dark:text-[#38BDF8] border border-[#0475BC]/25;
   }
   
   .badge-green {
-    @apply bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20;
+    @apply bg-[#009783]/10 text-[#00856D] dark:text-[#34D399] border border-[#009783]/25;
   }
   
   .badge-purple {
@@ -65,11 +65,11 @@
   }
   
   .badge-red {
-    @apply bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20;
+    @apply bg-[#CF1F2E]/10 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/25;
   }
   
   .badge-yellow {
-    @apply bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20;
+    @apply bg-[#EBAB33]/15 text-[#A85D00] dark:text-[#FBBF24] border border-[#EBAB33]/30;
   }
   
   .badge-gray {
@@ -106,7 +106,7 @@
   }
 
   .markdown-prose h3 {
-    @apply text-[11.5px] text-blue-600 dark:text-blue-400;
+    @apply text-[11.5px] text-[#CF1F2E] dark:text-[#F87171];
   }
 
   .markdown-prose h4 {
@@ -150,7 +150,7 @@
   }
 
   .markdown-prose code {
-    @apply px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-mono text-[11px] border border-zinc-200 dark:border-zinc-700;
+    @apply px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[#CF1F2E] dark:text-[#F87171] font-mono text-[11px] border border-zinc-200 dark:border-zinc-700;
   }
 
   .markdown-prose pre {
@@ -162,6 +162,6 @@
   }
 
   .markdown-prose blockquote {
-    @apply border-l-2 border-blue-500 pl-3 py-1 my-2 bg-blue-50/40 dark:bg-blue-950/20 text-zinc-700 dark:text-zinc-300 italic rounded-r;
+    @apply border-l-2 border-[#CF1F2E] pl-3 py-1 my-2 bg-[#CF1F2E]/5 dark:bg-[#CF1F2E]/10 text-zinc-700 dark:text-zinc-300 italic rounded-r;
   }
 }

@@ -68,7 +68,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
             <div className={`p-2 rounded-xl ${
               isSentinel
                 ? 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 text-rose-600 dark:text-rose-400'
-                : 'bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 text-blue-600 dark:text-blue-400'
+                : 'bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 border border-[#CF1F2E]/30 dark:border-[#F87171]/40 text-[#CF1F2E] dark:text-[#F87171]'
             }`}>
               {isSentinel ? <Radar size={18} className="animate-pulse" /> : <Terminal size={18} />}
             </div>
@@ -120,7 +120,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
           {/* Mission & Overview Box */}
           <div className="p-4 rounded-xl bg-zinc-50 dark:bg-[#16161a] border border-zinc-200 dark:border-zinc-800/80 space-y-2">
             <div className="flex items-center space-x-2 text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
-              <Layers size={13} className="text-blue-500" />
+              <Layers size={13} className="text-[#CF1F2E]" />
               <span>Primary Mission & Role</span>
             </div>
             <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 leading-snug">
@@ -144,7 +144,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
                 onClick={() => setActiveTab('all')}
                 className={`px-2.5 py-1 rounded-md transition-colors ${
                   activeTab === 'all' 
-                    ? 'bg-white dark:bg-[#1a1a1f] text-zinc-900 dark:text-zinc-100 font-bold shadow-2xs' 
+                    ? 'bg-[#CF1F2E] text-white font-bold shadow-2xs' 
                     : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -154,7 +154,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
                 onClick={() => setActiveTab('l1')}
                 className={`px-2.5 py-1 rounded-md transition-colors ${
                   activeTab === 'l1' 
-                    ? 'bg-emerald-500 text-white font-bold shadow-2xs' 
+                    ? 'bg-[#CF1F2E] text-white font-bold shadow-2xs' 
                     : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -164,7 +164,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
                 onClick={() => setActiveTab('l2')}
                 className={`px-2.5 py-1 rounded-md transition-colors ${
                   activeTab === 'l2' 
-                    ? 'bg-blue-500 text-white font-bold shadow-2xs' 
+                    ? 'bg-[#CF1F2E] text-white font-bold shadow-2xs' 
                     : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -174,7 +174,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
                 onClick={() => setActiveTab('l3')}
                 className={`px-2.5 py-1 rounded-md transition-colors ${
                   activeTab === 'l3' 
-                    ? 'bg-blue-600 text-white font-bold shadow-2xs' 
+                    ? 'bg-[#CF1F2E] text-white font-bold shadow-2xs' 
                     : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -210,19 +210,19 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
 
             {/* L2 Card */}
             {(activeTab === 'all' || activeTab === 'l2') && (
-              <div className="p-4 rounded-xl border border-blue-200/70 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20 space-y-2.5">
+              <div className="p-4 rounded-xl border border-[#CF1F2E]/30 dark:border-[#CF1F2E]/40 bg-[#CF1F2E]/5 dark:bg-[#CF1F2E]/10 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500" />
-                    <span className="font-bold text-xs text-blue-800 dark:text-blue-300 uppercase tracking-wide">
+                    <span className="w-2 h-2 rounded-full bg-[#CF1F2E]" />
+                    <span className="font-bold text-xs text-[#CF1F2E] dark:text-[#F87171] uppercase tracking-wide">
                       {profile.l2Summary.title}
                     </span>
                   </div>
-                  <span className="text-[10px] text-blue-700/80 dark:text-blue-400/80 font-mono bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-md">
+                  <span className="text-[10px] text-[#CF1F2E] dark:text-[#F87171] font-mono bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 px-2 py-0.5 rounded-md">
                     Audience: {profile.l2Summary.audience}
                   </span>
                 </div>
-                <ul className="space-y-1.5 pl-3 list-disc text-zinc-700 dark:text-zinc-300 marker:text-blue-500 text-xs">
+                <ul className="space-y-1.5 pl-3 list-disc text-zinc-700 dark:text-zinc-300 marker:text-[#CF1F2E] text-xs">
                   {profile.l2Summary.points.map((pt, idx) => (
                     <li key={idx} className="leading-relaxed">{pt}</li>
                   ))}
@@ -232,19 +232,19 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
 
             {/* L3 Card */}
             {(activeTab === 'all' || activeTab === 'l3') && (
-              <div className="p-4 rounded-xl border border-blue-200/70 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20 space-y-2.5">
+              <div className="p-4 rounded-xl border border-[#CF1F2E]/30 dark:border-[#CF1F2E]/40 bg-[#CF1F2E]/5 dark:bg-[#CF1F2E]/10 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-600" />
-                    <span className="font-bold text-xs text-blue-800 dark:text-blue-300 uppercase tracking-wide">
+                    <span className="w-2 h-2 rounded-full bg-[#B71825]" />
+                    <span className="font-bold text-xs text-[#CF1F2E] dark:text-[#F87171] uppercase tracking-wide">
                       {profile.l3Summary.title}
                     </span>
                   </div>
-                  <span className="text-[10px] text-blue-700/80 dark:text-blue-400/80 font-mono bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-md">
+                  <span className="text-[10px] text-[#CF1F2E] dark:text-[#F87171] font-mono bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 px-2 py-0.5 rounded-md">
                     Audience: {profile.l3Summary.audience}
                   </span>
                 </div>
-                <ul className="space-y-1.5 pl-3 list-disc text-zinc-700 dark:text-zinc-300 marker:text-blue-600 text-xs">
+                <ul className="space-y-1.5 pl-3 list-disc text-zinc-700 dark:text-zinc-300 marker:text-[#CF1F2E] text-xs">
                   {profile.l3Summary.points.map((pt, idx) => (
                     <li key={idx} className="leading-relaxed">{pt}</li>
                   ))}
@@ -297,7 +297,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
           <div className="p-4 rounded-xl bg-zinc-50 dark:bg-[#16161a] border border-zinc-200 dark:border-zinc-800/80 space-y-3 font-mono">
             <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-bold tracking-wider">
               <div className="flex items-center space-x-1.5">
-                <Zap size={12} className="text-blue-500" />
+                <Zap size={12} className="text-[#CF1F2E]" />
                 <span>Live Token & Invocation Telemetry</span>
               </div>
               <span>Total Invocations: {agentMetrics?.invocation_count || 0}</span>
@@ -306,7 +306,7 @@ export default function AgentDetailModal({ agentName, agentInfo, agentMetrics, s
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="p-2.5 rounded-lg bg-white dark:bg-[#121215] border border-zinc-200 dark:border-zinc-800 space-y-1">
                 <span className="text-[10px] text-zinc-400 uppercase font-bold">Current Session (localStorage)</span>
-                <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                <div className="text-sm font-bold text-[#CF1F2E] dark:text-[#F87171]">
                   {agSession.total.toLocaleString()} tokens
                 </div>
                 <div className="flex items-center space-x-3 text-[10px] text-zinc-500 dark:text-zinc-400 pt-0.5">

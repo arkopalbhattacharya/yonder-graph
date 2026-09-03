@@ -48,7 +48,7 @@ export default function MetricsDashboard({ isActive }) {
     return (
       <div className="h-full w-full flex items-center justify-center font-mono text-xs text-zinc-500">
         <div className="flex items-center space-x-2">
-          <RefreshCw size={14} className="animate-spin text-blue-500" />
+          <RefreshCw size={14} className="animate-spin text-[#CF1F2E]" />
           <span>Aggregating PostgreSQL and Neo4j telemetry metrics...</span>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default function MetricsDashboard({ isActive }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
         <div>
           <div className="flex items-center space-x-2">
-            <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+            <div className="p-1.5 rounded-lg bg-[#CF1F2E]/10 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/20">
               <BarChart3 size={16} />
             </div>
             <h1 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
@@ -92,7 +92,7 @@ export default function MetricsDashboard({ isActive }) {
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
             title="Refresh All Metrics"
           >
-            <RefreshCw size={12} className={isLoading ? "animate-spin text-blue-500" : ""} />
+            <RefreshCw size={12} className={isLoading ? "animate-spin text-[#CF1F2E]" : ""} />
             <span>Refresh</span>
           </button>
         </div>
@@ -107,7 +107,7 @@ export default function MetricsDashboard({ isActive }) {
             <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-wider">
               Total Incidents Triaged
             </span>
-            <div className="p-1 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400">
+            <div className="p-1 rounded bg-[#CF1F2E]/10 text-[#CF1F2E] dark:text-[#F87171]">
               <Activity size={13} />
             </div>
           </div>
@@ -201,7 +201,7 @@ export default function MetricsDashboard({ isActive }) {
         <div className="p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-[#111114]/70 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800/60">
             <div className="flex items-center space-x-2">
-              <Boxes size={14} className="text-blue-500" />
+              <Boxes size={14} className="text-[#CF1F2E]" />
               <span className="font-bold text-zinc-800 dark:text-zinc-200">
                 WMS Incident Domain Distribution
               </span>
@@ -269,7 +269,7 @@ export default function MetricsDashboard({ isActive }) {
 
                   <div 
                     style={{ height: `${heightPct}%` }}
-                    className="w-full rounded-t-md bg-blue-500/80 hover:bg-blue-600 transition-all cursor-pointer"
+                    className="w-full rounded-t-md bg-[#CF1F2E]/80 hover:bg-[#CF1F2E] transition-all cursor-pointer"
                   />
                   <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono">
                     {item.time}
@@ -347,7 +347,7 @@ export default function MetricsDashboard({ isActive }) {
               return (
                 <div key={idx} className="space-y-1">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-blue-600 dark:text-blue-400 font-mono">
+                    <span className="font-bold text-[#CF1F2E] dark:text-[#F87171] font-mono">
                       {t.table}
                     </span>
                     <span className="text-zinc-500 dark:text-zinc-400 font-mono text-[10px]">
@@ -435,7 +435,7 @@ export default function MetricsDashboard({ isActive }) {
                   <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
                     f.severity === 'CRITICAL' ? 'bg-rose-500/10 text-rose-600 border border-rose-500/20' :
                     f.severity === 'HIGH' ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' :
-                    'bg-blue-500/10 text-blue-600 border border-blue-500/20'
+                    'bg-[#CF1F2E]/10 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/20'
                   }`}>
                     {f.count} hits
                   </span>

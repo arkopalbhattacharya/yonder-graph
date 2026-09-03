@@ -46,7 +46,7 @@ export default function EnrichmentAgentModal({
         {/* Modal Header */}
         <div className="px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
+            <div className="p-2 rounded-xl bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40">
               <Cpu size={18} />
             </div>
             <div>
@@ -55,7 +55,7 @@ export default function EnrichmentAgentModal({
                   Enrichment Agentic Loop
                 </h3>
                 {isUploading ? (
-                  <span className="flex items-center space-x-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 font-semibold">
+                  <span className="flex items-center space-x-1 text-[10px] px-2 py-0.5 rounded-full bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40 font-semibold">
                     <Loader2 size={10} className="animate-spin" />
                     <span>RUNNING_LOOP</span>
                   </span>
@@ -142,7 +142,7 @@ export default function EnrichmentAgentModal({
               <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/70 border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between">
                 <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Loop Duration</span>
                 <div className="flex items-center space-x-1.5 mt-1">
-                  <Clock size={16} className="text-blue-500" />
+                  <Clock size={16} className="text-[#CF1F2E]" />
                   <span className="font-bold text-xs text-zinc-900 dark:text-zinc-100">
                     {resultData.duration_ms || 0} ms
                   </span>
@@ -157,7 +157,7 @@ export default function EnrichmentAgentModal({
           {/* ── Agentic Loop Stepper Timeline ── */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center space-x-1.5">
-              <Layers size={13} className="text-blue-500" />
+              <Layers size={13} className="text-[#CF1F2E]" />
               <span>Agentic Execution Trace</span>
             </h4>
 
@@ -174,7 +174,7 @@ export default function EnrichmentAgentModal({
                       isStepFinished 
                         ? 'bg-emerald-500 text-white border-emerald-600 shadow-xs' 
                         : isStepActive 
-                          ? 'bg-blue-500 text-white border-blue-600 animate-pulse shadow-xs' 
+                          ? 'bg-[#CF1F2E] text-white border-[#B71825] animate-pulse shadow-xs' 
                           : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-300 dark:border-zinc-700'
                     }`}>
                       {isStepFinished ? (
@@ -189,7 +189,7 @@ export default function EnrichmentAgentModal({
                     {/* Step Content Card */}
                     <div className={`p-3 rounded-xl border transition-all ${
                       isStepActive 
-                        ? 'bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/60 shadow-xs' 
+                        ? 'bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 border-[#CF1F2E]/30 dark:border-[#CF1F2E]/40 shadow-xs' 
                         : isStepFinished 
                           ? 'bg-zinc-50/70 dark:bg-[#151518] border-zinc-200 dark:border-zinc-800/80' 
                           : 'bg-zinc-50/30 dark:bg-[#111114] border-zinc-200/50 dark:border-zinc-800/40 opacity-50'
@@ -204,7 +204,7 @@ export default function EnrichmentAgentModal({
                           </span>
                         </div>
                         {step.score && (
-                          <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+                          <span className="text-[10px] font-bold text-[#CF1F2E] dark:text-[#F87171] bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 px-2 py-0.5 rounded-full border border-[#CF1F2E]/30 dark:border-[#F87171]/40">
                             {step.score}
                           </span>
                         )}
@@ -233,7 +233,7 @@ export default function EnrichmentAgentModal({
                     key={idx} 
                     className="px-2 py-1 rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] flex items-center space-x-1.5 text-zinc-700 dark:text-zinc-300"
                   >
-                    <span className="font-semibold text-blue-600 dark:text-blue-400">[{ent.type || 'Node'}]</span>
+                    <span className="font-semibold text-[#CF1F2E] dark:text-[#F87171]">[{ent.type || 'Node'}]</span>
                     <span>{ent.name}</span>
                     {ent.domain && (
                       <span className="text-[9px] text-zinc-400 font-mono">({ent.domain})</span>

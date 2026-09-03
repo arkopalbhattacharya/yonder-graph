@@ -109,14 +109,14 @@ export default function Sidebar({
 
   return (
     <aside 
-      className={`h-screen flex flex-col border-r border-zinc-200 dark:border-zinc-800/80 bg-white/70 dark:bg-[#0c0c0f] backdrop-blur transition-all duration-200 flex-shrink-0 z-40 font-mono text-xs ${
+      className={`h-screen flex flex-col border-r border-zinc-200 dark:border-zinc-800/80 bg-white/80 dark:bg-[#141418] backdrop-blur transition-all duration-200 flex-shrink-0 z-40 font-mono text-xs ${
         isCollapsed ? 'w-0 overflow-hidden border-r-0' : 'w-56 sm:w-64'
       }`}
     >
       {/* ── Brand & Collapse Header ── */}
       <div className="p-3.5 border-b border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
-          <div className="h-7 w-7 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950 font-black text-xs shadow-xs">
+          <div className="h-7 w-7 rounded-lg bg-[#CF1F2E] flex items-center justify-center text-white font-black text-xs shadow-xs">
             yg
           </div>
           <div>
@@ -142,7 +142,7 @@ export default function Sidebar({
       <div className="p-2.5 pb-1 flex-shrink-0">
         <button
           onClick={onNewChat}
-          className="w-full flex items-center justify-center py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 text-white text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
+          className="w-full flex items-center justify-center py-2 px-3 rounded-lg bg-[#CF1F2E] hover:bg-[#B71825] active:bg-[#9B2C2C] dark:bg-[#CF1F2E] dark:hover:bg-[#E53E3E] text-white text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
         >
           <span>+ new chat</span>
         </button>
@@ -258,7 +258,7 @@ export default function Sidebar({
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-left transition-all font-mono text-xs cursor-pointer ${
                     isActive
-                      ? 'bg-zinc-200/80 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
+                      ? 'bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] font-semibold shadow-2xs'
                       : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 hover:text-zinc-900 dark:hover:text-zinc-200'
                   }`}
                 >
@@ -271,6 +271,13 @@ export default function Sidebar({
             })}
           </div>
         </div>
+      </div>
+
+      {/* ── Partnership Monospace Brand Label ── */}
+      <div className="px-3 py-1.5 flex items-center justify-center select-none flex-shrink-0">
+        <span className="font-mono text-[9px] font-bold tracking-[0.28em] text-zinc-400 dark:text-zinc-600 uppercase">
+          MICHAELS x TCS
+        </span>
       </div>
 
       {/* ── Footer: User Profile & Notification Center ── */}
@@ -407,7 +414,7 @@ export default function Sidebar({
                   type="button"
                   onClick={toggleAskMode}
                   className={`w-8 h-4.5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
-                    enableAskMode ? 'bg-blue-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
+                    enableAskMode ? 'bg-[#CF1F2E] justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
                   }`}
                   title={enableAskMode ? "Disable Ask Mode" : "Enable Ask Mode"}
                 >
@@ -432,7 +439,7 @@ export default function Sidebar({
                   type="button"
                   onClick={toggleFileUpload}
                   className={`w-8 h-4.5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
-                    enableFileUpload ? 'bg-blue-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
+                    enableFileUpload ? 'bg-[#CF1F2E] justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
                   }`}
                   title={enableFileUpload ? "Disable Document Upload" : "Enable Document Upload"}
                 >
@@ -457,7 +464,7 @@ export default function Sidebar({
                   type="button"
                   onClick={toggleShowReasoning}
                   className={`w-8 h-4.5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
-                    enableShowReasoning ? 'bg-blue-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
+                    enableShowReasoning ? 'bg-[#CF1F2E] justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
                   }`}
                   title={enableShowReasoning ? "Disable Agent Reasoning" : "Enable Agent Reasoning"}
                 >
@@ -482,7 +489,7 @@ export default function Sidebar({
                   type="button"
                   onClick={toggleSentinel}
                   className={`w-8 h-4.5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
-                    enableSentinel ? 'bg-rose-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
+                    enableSentinel ? 'bg-[#CF1F2E] justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
                   }`}
                   title={enableSentinel ? "Disable Sentinel" : "Enable Sentinel"}
                 >
@@ -507,7 +514,7 @@ export default function Sidebar({
                   type="button"
                   onClick={toggleChatFollowup}
                   className={`w-8 h-4.5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
-                    enableChatFollowup ? 'bg-blue-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
+                    enableChatFollowup ? 'bg-[#CF1F2E] justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
                   }`}
                   title={enableChatFollowup ? "Disable Chat Follow-ups" : "Enable Chat Follow-ups"}
                 >
@@ -610,7 +617,7 @@ export default function Sidebar({
               </div>
               <ul className="text-[11px] text-zinc-600 dark:text-zinc-300 space-y-1.5 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60">
                 <li className="flex items-start space-x-1.5">
-                  <span className="text-blue-500 font-bold">•</span>
+                  <span className="text-[#CF1F2E] font-bold">•</span>
                   <span><strong>Outbound Waves:</strong> Detects allocation shortfalls in <code className="text-zinc-800 dark:text-zinc-200 font-bold">PCKWAV</code> & <code className="text-zinc-800 dark:text-zinc-200 font-bold">ORD_LINE</code> before pickers stall.</span>
                 </li>
                 <li className="flex items-start space-x-1.5">
@@ -692,7 +699,7 @@ function SessionItem({ session, isActive, onSelect, onTogglePin, onDelete }) {
       onClick={onSelect}
       className={`group px-2.5 py-1.5 rounded-lg cursor-pointer transition-all flex items-start justify-between text-xs ${
         isActive
-          ? 'bg-zinc-200/80 dark:bg-[#18181b] text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
+          ? 'bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] font-semibold shadow-2xs'
           : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 hover:text-zinc-900 dark:hover:text-zinc-200'
       }`}
     >

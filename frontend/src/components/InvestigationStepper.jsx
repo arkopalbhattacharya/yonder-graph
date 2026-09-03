@@ -79,19 +79,19 @@ export default function InvestigationStepper({ steps, sessionId }) {
 
   return (
     <div className="my-3.5 font-mono">
-      <div className="text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold mb-2.5 flex items-center space-x-1.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+      <div className="text-[10px] uppercase tracking-wider text-[#CF1F2E] dark:text-[#F87171] font-semibold mb-2.5 flex items-center space-x-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#CF1F2E]"></span>
         <span>Investigation Steps</span>
       </div>
 
       <div className="relative pl-6 space-y-4">
         {/* Vertical Dotted Connector Line */}
-        <div className="absolute left-2.5 top-3 bottom-3 w-px border-l-2 border-dotted border-blue-400/50 dark:border-blue-500/40 pointer-events-none" />
+        <div className="absolute left-2.5 top-3 bottom-3 w-px border-l-2 border-dotted border-[#CF1F2E]/50 dark:border-[#F87171]/40 pointer-events-none" />
 
         {steps.map((step, idx) => (
           <div key={idx} className="relative group">
             {/* Step Number Badge */}
-            <div className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-blue-50 dark:bg-blue-950/80 border border-blue-500/60 text-blue-600 dark:text-blue-400 font-bold text-[10px] shadow-xs z-10">
+            <div className="absolute -left-6 top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 border border-[#CF1F2E]/50 text-[#CF1F2E] dark:text-[#F87171] font-bold text-[10px] shadow-xs z-10">
               {step.step_number || idx + 1}
             </div>
 
@@ -143,15 +143,15 @@ export default function InvestigationStepper({ steps, sessionId }) {
             <button
               onClick={handleConsolidateSQL}
               disabled={isConsolidating}
-              className="w-full flex items-center justify-center py-2 px-3 rounded-lg bg-blue-50/80 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 border border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-300 text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full flex items-center justify-center py-2 px-3 rounded-lg bg-[#CF1F2E]/10 hover:bg-[#CF1F2E]/20 dark:bg-[#CF1F2E]/20 dark:hover:bg-[#CF1F2E]/30 border border-[#CF1F2E] dark:border-[#F87171] text-[#CF1F2E] dark:text-[#F87171] text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
             >
               <span>{isConsolidating ? 'Consolidating SQL Script...' : 'Generate SQL Script'}</span>
             </button>
           ) : (
-            <div className="p-3 bg-zinc-900 dark:bg-[#09090b] border border-blue-900/60 rounded-lg text-white space-y-2">
+            <div className="p-3 bg-zinc-900 dark:bg-[#09090b] border border-[#CF1F2E]/40 rounded-lg text-white space-y-2">
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center space-x-1.5 text-xs text-blue-300 font-semibold truncate">
-                  <Terminal size={13} className="text-blue-400 shrink-0" />
+                <div className="flex items-center space-x-1.5 text-xs text-[#F87171] font-semibold truncate">
+                  <Terminal size={13} className="text-[#CF1F2E] shrink-0" />
                   <span className="truncate">Oracle Diagnostic SQL Script</span>
                 </div>
 
@@ -159,12 +159,12 @@ export default function InvestigationStepper({ steps, sessionId }) {
                   <button
                     onClick={() => setIsWordWrap(!isWordWrap)}
                     className={`p-1 rounded text-[10px] flex items-center space-x-1 px-2 transition-colors cursor-pointer ${isWordWrap
-                        ? 'bg-blue-600/40 text-blue-300 border border-blue-500/50 font-bold'
+                        ? 'bg-[#CF1F2E] text-white border border-[#CF1F2E] font-bold shadow-2xs'
                         : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
                       }`}
                     title={isWordWrap ? "Disable Text Wrap" : "Enable Text Wrap"}
                   >
-                    <WrapText size={11} className={isWordWrap ? "text-blue-400" : "text-zinc-400"} />
+                    <WrapText size={11} className={isWordWrap ? "text-white" : "text-zinc-400"} />
                     <span>Wrap</span>
                   </button>
                   <button

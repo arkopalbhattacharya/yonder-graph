@@ -66,7 +66,7 @@ export default function GovernanceViewer({ isActive }) {
     return (
       <div className="flex items-center justify-center h-full w-full bg-surface-light dark:bg-[#09090b] text-xs font-mono text-zinc-500">
         <div className="flex items-center space-x-2">
-          <RefreshCw size={14} className="animate-spin text-blue-500" />
+          <RefreshCw size={14} className="animate-spin text-[#CF1F2E]" />
           <span>loading_governance_policy_and_live_interceptions...</span>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function GovernanceViewer({ isActive }) {
       <div className="px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800 flex flex-wrap gap-2 justify-between items-center bg-white/80 dark:bg-[#111114]/80 backdrop-blur z-10 flex-shrink-0">
         <div>
           <div className="flex items-center space-x-2">
-            <ShieldAlert size={16} className="text-blue-500" />
+            <ShieldAlert size={16} className="text-[#CF1F2E]" />
             <h2 className="text-sm font-bold tracking-tight">zero_error_governance</h2>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
               live_telemetry_active
@@ -138,7 +138,7 @@ export default function GovernanceViewer({ isActive }) {
               onClick={() => setActiveSubTab('matrix')}
               className={`px-3 py-1 rounded-md transition-all font-medium cursor-pointer ${
                 activeSubTab === 'matrix'
-                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs font-semibold'
+                  ? 'bg-[#CF1F2E] text-white shadow-2xs font-semibold'
                   : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
             >
@@ -148,15 +148,15 @@ export default function GovernanceViewer({ isActive }) {
               onClick={() => setActiveSubTab('interceptions')}
               className={`px-3 py-1 rounded-md transition-all font-medium flex items-center space-x-1.5 cursor-pointer ${
                 activeSubTab === 'interceptions'
-                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs font-semibold'
+                  ? 'bg-[#CF1F2E] text-white shadow-2xs font-semibold'
                   : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
             >
-              <Activity size={12} className={activeSubTab === 'interceptions' ? "text-blue-500" : "text-zinc-400"} />
+              <Activity size={12} className={activeSubTab === 'interceptions' ? "text-white" : "text-zinc-400"} />
               <span>Live Interceptions</span>
               <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold ${
                 activeSubTab === 'interceptions' 
-                  ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
+                  ? 'bg-white/20 text-white border border-white/30'
                   : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
               }`}>
                 {totalInterceptions}
@@ -170,7 +170,7 @@ export default function GovernanceViewer({ isActive }) {
             className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 transition-colors shadow-2xs cursor-pointer flex items-center space-x-1 text-[11px]"
             title="Refresh Governance Data"
           >
-            <RefreshCw size={12} className={refreshing ? 'animate-spin text-blue-500' : ''} />
+            <RefreshCw size={12} className={refreshing ? 'animate-spin text-[#CF1F2E]' : ''} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
 
@@ -195,13 +195,13 @@ export default function GovernanceViewer({ isActive }) {
               <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-[#111114] shadow-2xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                   <div className="flex items-center space-x-2">
-                    <div className="h-2 w-2 rounded-full bg-blue-500 animate-ping" />
+                    <div className="h-2 w-2 rounded-full bg-[#CF1F2E] animate-ping" />
                     <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center space-x-1.5">
                       <span>Live Chat Interceptions & Cognitive Safety Stream</span>
                     </h3>
                   </div>
                   <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                    Total Evaluated Invocations: <strong className="text-blue-600 dark:text-blue-400 font-bold">{totalInterceptions}</strong>
+                    Total Evaluated Invocations: <strong className="text-[#CF1F2E] dark:text-[#F87171] font-bold">{totalInterceptions}</strong>
                   </div>
                 </div>
 
@@ -225,7 +225,7 @@ export default function GovernanceViewer({ isActive }) {
                   </div>
                   <div className="bg-white dark:bg-zinc-900 p-2.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 col-span-2 sm:col-span-1">
                     <div className="text-zinc-400 text-[10px] uppercase font-semibold">Clean Passes</div>
-                    <div className="text-sm font-bold text-blue-600 dark:text-blue-400 mt-0.5">{passedCount}</div>
+                    <div className="text-sm font-bold text-[#CF1F2E] dark:text-[#F87171] mt-0.5">{passedCount}</div>
                   </div>
                 </div>
               </div>
@@ -241,7 +241,7 @@ export default function GovernanceViewer({ isActive }) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="filter by incident topic, domain, session ID..."
-                    className="w-full bg-white dark:bg-[#111114] border border-zinc-200 dark:border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-white dark:bg-[#111114] border border-zinc-200 dark:border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-[#CF1F2E]"
                   />
                 </div>
 
@@ -261,7 +261,7 @@ export default function GovernanceViewer({ isActive }) {
                       onClick={() => setFilterRisk(tab.id)}
                       className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap font-medium cursor-pointer border ${
                         filterRisk === tab.id
-                          ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 shadow-2xs font-semibold'
+                          ? 'bg-[#CF1F2E] text-white border-[#CF1F2E] shadow-2xs font-semibold'
                           : 'bg-zinc-100/80 dark:bg-zinc-900/60 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 border-transparent hover:bg-zinc-200/70 dark:hover:bg-zinc-800/60'
                       }`}
                     >
@@ -373,7 +373,7 @@ export default function GovernanceViewer({ isActive }) {
                         
                         <button
                           onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                          className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center space-x-0.5 ml-2 cursor-pointer flex-shrink-0"
+                          className="text-[11px] text-[#CF1F2E] dark:text-[#F87171] hover:underline flex items-center space-x-0.5 ml-2 cursor-pointer flex-shrink-0"
                         >
                           <span>{isExpanded ? 'Collapse' : 'Inspect Safety Trace'}</span>
                           {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
@@ -409,7 +409,7 @@ export default function GovernanceViewer({ isActive }) {
                           {/* MOCA Command if applicable */}
                           {item.moca_command && (
                             <div className="p-2 rounded bg-zinc-900 text-zinc-100 font-mono text-[10.5px]">
-                              <span className="text-blue-400 select-none font-bold mr-1">$ moca:</span>
+                              <span className="text-[#CF1F2E] dark:text-[#F87171] select-none font-bold mr-1">$ moca:</span>
                               <code>{item.moca_command}</code>
                             </div>
                           )}
@@ -466,7 +466,7 @@ export default function GovernanceViewer({ isActive }) {
               {/* Section 1: Three-Tier Guardrail Specification Header & Description */}
               <div className="space-y-1.5">
                 <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center space-x-2">
-                  <ShieldCheck size={14} className="text-blue-500" />
+                  <ShieldCheck size={14} className="text-[#CF1F2E]" />
                   <span>Three-Tier Guardrail Specification</span>
                 </div>
                 <p className="text-[11.5px] text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-4xl">
@@ -478,13 +478,13 @@ export default function GovernanceViewer({ isActive }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 
                 {/* Tier 1 Box */}
-                <div className="p-5 rounded-xl border border-blue-200/80 dark:border-blue-900/60 bg-blue-50/20 dark:bg-[#111118] shadow-xs flex flex-col justify-between">
+                <div className="p-5 rounded-xl border border-[#CF1F2E]/30 dark:border-[#CF1F2E]/40 bg-[#CF1F2E]/5 dark:bg-[#CF1F2E]/10 shadow-xs flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-2.5">
-                      <span className="text-xs font-bold flex items-center text-blue-600 dark:text-blue-400">
-                        <ShieldCheck size={15} className="mr-1.5 text-blue-500" /> Tier 1: Cognitive Safety & Intent Governance
+                      <span className="text-xs font-bold flex items-center text-[#CF1F2E] dark:text-[#F87171]">
+                        <ShieldCheck size={15} className="mr-1.5 text-[#CF1F2E]" /> Tier 1: Cognitive Safety & Intent Governance
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40">
                         ai_supervisor_gate
                       </span>
                     </div>
@@ -493,19 +493,19 @@ export default function GovernanceViewer({ isActive }) {
                     </p>
                     <ul className="space-y-2 text-[11px] text-zinc-700 dark:text-zinc-300">
                       <li className="flex items-start">
-                        <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                        <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                         <span><strong>Automated Incident Risk Triage:</strong> Evaluates prompt intent from Low to Critical risk against WMS operational boundaries.</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                        <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                         <span><strong>SOP & Runbook Alignment:</strong> Traverses verified Standard Operating Procedures (SOPs) in Neo4j to guarantee safe, recommended workflows.</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                        <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                         <span><strong>Pre-Condition & Rollback Verification:</strong> Verifies transaction lock prerequisites and prepares deterministic rollback steps.</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                        <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                         <span><strong>Multi-Persona Operational Context:</strong> Generates tailored operational summaries for L1 Floor Ops, L2 Support, and L3 SMEs.</span>
                       </li>
                     </ul>
@@ -513,13 +513,13 @@ export default function GovernanceViewer({ isActive }) {
                 </div>
 
                 {/* Tier 2 Box */}
-                <div className="p-5 rounded-xl border border-blue-200/80 dark:border-blue-900/60 bg-blue-50/20 dark:bg-[#111118] shadow-xs flex flex-col justify-between">
+                <div className="p-5 rounded-xl border border-[#CF1F2E]/30 dark:border-[#CF1F2E]/40 bg-[#CF1F2E]/5 dark:bg-[#CF1F2E]/10 shadow-xs flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-2.5">
-                      <span className="text-xs font-bold flex items-center text-blue-600 dark:text-blue-400">
-                        <Lock size={15} className="mr-1.5 text-blue-500" /> Tier 2: Deterministic AST Hard Guard
+                      <span className="text-xs font-bold flex items-center text-[#CF1F2E] dark:text-[#F87171]">
+                        <Lock size={15} className="mr-1.5 text-[#CF1F2E]" /> Tier 2: Deterministic AST Hard Guard
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40">
                         sql_ast_validator
                       </span>
                     </div>
@@ -528,19 +528,19 @@ export default function GovernanceViewer({ isActive }) {
                     </p>
                     <ul className="space-y-2 text-[11px] text-zinc-700 dark:text-zinc-300">
                       <li className="flex items-start">
-                        <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                        <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                         <span><strong>Absolute Zero-Mutation Guarantee:</strong> Hard-blocks <code>DELETE</code>, <code>UPDATE</code>, <code>DROP</code>, <code>INSERT</code>, <code>ALTER</code>, and <code>TRUNCATE</code> tokens.</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                        <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                         <span><strong>Strict Read-Only Enforcement:</strong> Permits only safe diagnostic statements (<code>SELECT</code>, <code>WITH</code>, <code>EXPLAIN PLAN</code>).</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                        <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                         <span><strong>Automatic Row Bound Injection:</strong> Automatically enforces <code>ROWNUM &lt;= 100</code> boundaries to prevent thread saturation and table locks.</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                        <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                         <span><strong>Oracle Parameter Bind Sanitization:</strong> Validates extracted business keys (Order #, Wave ID, LPN) against regex patterns to eliminate injection.</span>
                       </li>
                     </ul>
@@ -550,33 +550,33 @@ export default function GovernanceViewer({ isActive }) {
               </div>
 
               {/* Tier 0 Box — Foundational Guardrail (Horizontal Full Width underneath Tier 1 and Tier 2) */}
-              <div className="p-5 rounded-xl border border-blue-200/80 dark:border-blue-900/60 bg-blue-50/20 dark:bg-[#111118] shadow-xs">
+              <div className="p-5 rounded-xl border border-[#CF1F2E]/30 dark:border-[#CF1F2E]/40 bg-[#CF1F2E]/5 dark:bg-[#CF1F2E]/10 shadow-xs">
                 <div className="flex flex-wrap items-center justify-between mb-2.5 gap-2">
-                  <span className="text-xs font-bold flex items-center text-blue-600 dark:text-blue-400">
-                    <Shield size={15} className="mr-1.5 text-blue-500" /> Tier 0: Data Privacy & PII Perimeter (Foundational Guardrail)
+                  <span className="text-xs font-bold flex items-center text-[#CF1F2E] dark:text-[#F87171]">
+                    <Shield size={15} className="mr-1.5 text-[#CF1F2E]" /> Tier 0: Data Privacy & PII Perimeter (Foundational Guardrail)
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40">
                     pii_sanitizer_perimeter • 0 GPU / On-Premise
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mb-3 leading-relaxed">
                   The foundational data security boundary running entirely on local CPU infrastructure. Automatically sanitizes sensitive customer identities, contact numbers, delivery addresses, and payment tokens across user chat prompts, live Oracle WMS query rows, Knowledge Studio document ingestion, and SME feedback loops before data ever leaves the local enterprise network.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 text-[11px] text-zinc-700 dark:text-zinc-300 pt-3 border-t border-blue-100 dark:border-blue-950/60">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 text-[11px] text-zinc-700 dark:text-zinc-300 pt-3 border-t border-[#CF1F2E]/20">
                   <div className="flex items-start">
-                    <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                    <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                     <span><strong>Inbound Prompt Tokenization:</strong> Masks emails, phones, names, and physical addresses to typed tokens (<code>&lt;PII_EMAIL_1&gt;</code>, <code>&lt;PII_NAME_1&gt;</code>) prior to cloud LLM dispatch.</span>
                   </div>
                   <div className="flex items-start">
-                    <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                    <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                     <span><strong>Live WMS Database Sanitization:</strong> Intercepts and scrubs sensitive tabular columns (names, addresses) in RAM before LLM context ingestion.</span>
                   </div>
                   <div className="flex items-start">
-                    <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                    <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                     <span><strong>Knowledge & SOP Document Stripping:</strong> Sanitizes uploaded SOP documents (PDF, Excel, Word, MD) before Neo4j graph embedding.</span>
                   </div>
                   <div className="flex items-start">
-                    <span className="text-blue-500 mr-2 select-none font-bold">▸</span>
+                    <span className="text-[#CF1F2E] mr-2 select-none font-bold">▸</span>
                     <span><strong>SME Feedback & HITL Protection:</strong> Cleanses thumbs-down diagnostic corrections and runbook notes before knowledge graph patching.</span>
                   </div>
                 </div>
@@ -586,7 +586,7 @@ export default function GovernanceViewer({ isActive }) {
               <div className="space-y-3 pt-2">
                 <div className="space-y-1.5">
                   <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center space-x-2">
-                    <Layers size={14} className="text-blue-500" />
+                    <Layers size={14} className="text-[#CF1F2E]" />
                     <span>Four-Tier Remediation Policy Matrix</span>
                   </div>
                   <p className="text-[11.5px] text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-4xl">
@@ -611,7 +611,7 @@ export default function GovernanceViewer({ isActive }) {
                       roleInYonder: "Directs support engineers through standard Blue Yonder WMS administrative screens (e.g. Work Queue Manager, Configuration Studio). Solves operational anomalies through verified UI workflows without requiring backend script execution or database mutations.",
                       scope: ["Releasing non-critical QC holds", "Resetting wave allocation thresholds", "Adjusting location operational flags", "Re-queuing pick work"],
                       approval: "Level 2 Application Support Engineer",
-                      badgeClass: "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800",
+                      badgeClass: "bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40",
                       badgeText: "UI Guided Workflow"
                     },
                     {
@@ -637,7 +637,7 @@ export default function GovernanceViewer({ isActive }) {
                       key={tier.level} 
                       className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111114] shadow-xs flex items-start gap-3.5 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-bold text-xs flex items-center justify-center flex-shrink-0 border border-blue-200 dark:border-blue-800">
+                      <div className="w-8 h-8 rounded-lg bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] font-bold text-xs flex items-center justify-center flex-shrink-0 border border-[#CF1F2E]/30 dark:border-[#F87171]/40">
                         L{tier.level}
                       </div>
                       <div className="flex-1 space-y-2">
@@ -676,7 +676,7 @@ export default function GovernanceViewer({ isActive }) {
               <div className="space-y-3 pt-2">
                 <div className="space-y-1">
                   <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center space-x-2">
-                    <Terminal size={14} className="text-blue-500" />
+                    <Terminal size={14} className="text-[#CF1F2E]" />
                     <span>Deterministic AST Hard Guard Rules</span>
                   </div>
                   <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
@@ -731,7 +731,7 @@ export default function GovernanceViewer({ isActive }) {
                     </div>
                     <div className="text-[11px] text-zinc-600 dark:text-zinc-300 pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
                       <span>Automatic Row Limit Safeguard:</span>
-                      <span className="font-bold text-blue-600 dark:text-blue-400 font-mono">
+                      <span className="font-bold text-[#CF1F2E] dark:text-[#F87171] font-mono">
                         {policy.governance_tiers?.tier2?.row_limit || 100} rows max
                       </span>
                     </div>

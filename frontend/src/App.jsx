@@ -168,7 +168,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-surface-light dark:bg-[#09090b] text-text-primary-light dark:text-text-primary-dark font-mono">
+    <div className="flex h-screen w-screen overflow-hidden bg-surface-light dark:bg-surface-dark text-text-primary-light dark:text-text-primary-dark font-mono">
       
       {/* ── Unified Left Pane ── */}
       <Sidebar 
@@ -187,16 +187,36 @@ export default function App() {
       {/* ── Main Immersive Workspace ── */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         
-        {/* Floating Sidebar Re-open button when collapsed */}
-        {isCollapsed && (
-          <button
-            onClick={() => setIsCollapsed(false)}
-            className="absolute left-3 top-3 z-30 p-1.5 rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 shadow-xs transition-colors"
-            title="Open Sidebar"
-          >
-            <PanelLeftOpen size={15} />
-          </button>
-        )}
+        {/* ── Workspace Top Brand Bar (Pushes down workspace content to prevent any overlap) ── */}
+        <div className="flex items-center justify-between px-4 sm:px-5 pt-3 pb-2 z-30 flex-shrink-0">
+          <div className="flex items-center space-x-3">
+            {/* Re-open Sidebar toggle when collapsed */}
+            {isCollapsed && (
+              <button
+                onClick={() => setIsCollapsed(false)}
+                className="p-1.5 rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 shadow-xs transition-colors cursor-pointer"
+                title="Open Sidebar"
+              >
+                <PanelLeftOpen size={15} />
+              </button>
+            )}
+
+            {/* Michaels Brand Logo Link (Immersive, Borderless & Backgroundless) */}
+            <a
+              href="https://www.michaels.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-105 active:scale-95 group focus:outline-none"
+              title="Michaels • Where Creativity Happens (michaels.com)"
+            >
+              <img 
+                src="/logo-michaels.png" 
+                alt="Michaels" 
+                className="h-6 sm:h-7 w-auto object-contain transition-all duration-200 filter group-hover:brightness-110 dark:drop-shadow-[0_2px_10px_rgba(207,31,46,0.35)]"
+              />
+            </a>
+          </div>
+        </div>
 
         {/* Dynamic Workspace Views */}
         <main className="flex-1 overflow-hidden relative">

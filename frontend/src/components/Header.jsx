@@ -56,7 +56,7 @@ export default function Header() {
             {/* Active LLM */}
             {health.llm_provider && (
               <div className="flex items-center space-x-1 px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 text-[10px]">
-                <Cpu size={10} className="text-blue-500" />
+                <Cpu size={10} className="text-[#CF1F2E]" />
                 <span>{health.llm_provider.provider}</span>
               </div>
             )}

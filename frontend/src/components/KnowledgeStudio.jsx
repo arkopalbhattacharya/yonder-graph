@@ -62,7 +62,7 @@ export default function KnowledgeStudio({ isActive }) {
       {/* Studio Header Bar */}
       <div className="px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center bg-white/80 dark:bg-[#111114]/80 backdrop-blur z-10 flex-shrink-0">
         <div className="flex items-center space-x-2">
-          <BookOpen size={16} className="text-blue-500" />
+          <BookOpen size={16} className="text-[#CF1F2E]" />
           <span className="font-bold text-sm">knowledge_studio</span>
         </div>
 
@@ -71,7 +71,7 @@ export default function KnowledgeStudio({ isActive }) {
             onClick={() => setActiveTab('browse')}
             className={`px-3.5 py-1 text-xs rounded-lg transition-all ${
               activeTab === 'browse' 
-                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs font-semibold' 
+                ? 'bg-[#CF1F2E] text-white shadow-2xs font-semibold' 
                 : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
             }`}
           >
@@ -81,13 +81,17 @@ export default function KnowledgeStudio({ isActive }) {
             onClick={() => setActiveTab('pending')}
             className={`px-3.5 py-1 text-xs rounded-lg transition-all flex items-center space-x-1.5 ${
               activeTab === 'pending' 
-                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs font-semibold' 
+                ? 'bg-[#CF1F2E] text-white shadow-2xs font-semibold' 
                 : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
             }`}
           >
             <span>sme_review_queue</span>
             {pendingReviews.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                activeTab === 'pending'
+                  ? 'bg-white/20 text-white border border-white/30'
+                  : 'bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800'
+              }`}>
                 {pendingReviews.length}
               </span>
             )}
@@ -125,7 +129,7 @@ export default function KnowledgeStudio({ isActive }) {
                 >
                   <div>
                     <div className="flex justify-between items-start mb-2">
-                      <span className="font-bold text-xs text-blue-600 dark:text-blue-400 font-mono">{sop.sop_id}</span>
+                      <span className="font-bold text-xs text-[#CF1F2E] dark:text-[#F87171] font-mono">{sop.sop_id}</span>
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
                         {sop.domain?.toLowerCase()}
                       </span>

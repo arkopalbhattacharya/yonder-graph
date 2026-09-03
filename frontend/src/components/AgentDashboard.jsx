@@ -113,7 +113,7 @@ export default function AgentDashboard({ isActive }) {
       <div className="px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center bg-white/80 dark:bg-[#111114]/80 backdrop-blur z-10 flex-shrink-0">
         <div>
           <div className="flex items-center space-x-2">
-            <Cpu size={15} className="text-blue-500" />
+            <Cpu size={15} className="text-[#CF1F2E]" />
             <h2 className="text-sm font-bold tracking-tight">agent_telemetry</h2>
           </div>
           <p className="text-zinc-500 dark:text-zinc-400 text-[11px] mt-0.5">
@@ -121,7 +121,7 @@ export default function AgentDashboard({ isActive }) {
           </p>
         </div>
         <div className="flex items-center space-x-2 text-[11px] bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xs">
-          <Server size={13} className="text-blue-500" />
+          <Server size={13} className="text-[#CF1F2E]" />
           <span>{llm_provider?.provider} / {llm_provider?.model}</span>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function AgentDashboard({ isActive }) {
               value={`${(lifetimeQueries || 0).toLocaleString()} / ${(telemetry?.total_invocations || 0).toLocaleString()}`} 
               sessionBadge={`Session: ${(sessionQueries || 0).toLocaleString()} ${sessionQueries === 1 ? 'query' : 'queries'} (${(activeSessionInvocations || 0).toLocaleString()} calls)`}
               icon={Activity} 
-              color="text-blue-500"
+              color="text-[#CF1F2E]"
             />
             <StatCard 
               title="p95_latency" 
@@ -152,7 +152,7 @@ export default function AgentDashboard({ isActive }) {
               subtext={`Lifetime In: ${(telemetry?.total_prompt_tokens || 0).toLocaleString()} • Out: ${(telemetry?.total_completion_tokens || 0).toLocaleString()}`}
               sessionBadge={`Session: ${(sessionTokens.total || 0).toLocaleString()} (${(sessionTokens.prompt || 0).toLocaleString()} in / ${(sessionTokens.completion || 0).toLocaleString()} out)`}
               icon={Zap} 
-              color="text-blue-500"
+              color="text-[#CF1F2E]"
             />
             <StatCard 
               title="gov_intercepts" 
@@ -171,7 +171,7 @@ export default function AgentDashboard({ isActive }) {
                 Active Squad ({activeAgents.length} Agents)
               </span>
               {!enableAskMode && (
-                <span className="px-2 py-0.5 rounded-md text-[10px] bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                <span className="px-2 py-0.5 rounded-md text-[10px] bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40">
                   Resolve Mode Only
                 </span>
               )}
@@ -216,7 +216,7 @@ export default function AgentDashboard({ isActive }) {
                           {isSentinel ? (
                             <Radar size={13} className="text-rose-500 animate-pulse" />
                           ) : (
-                            <Terminal size={13} className="text-blue-500" />
+                            <Terminal size={13} className="text-[#CF1F2E]" />
                           )}
                         </div>
                         {/* Glowing Health Indicator */}
@@ -254,7 +254,7 @@ export default function AgentDashboard({ isActive }) {
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                             isSentinel
                               ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
-                              : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
+                              : 'bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40'
                           }`}>
                             {info.tier}
                           </span>
@@ -271,7 +271,7 @@ export default function AgentDashboard({ isActive }) {
                           className={`inline-flex items-center font-semibold underline underline-offset-2 ml-1 cursor-pointer transition-colors ${
                             isSentinel 
                               ? 'text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300'
-                              : 'text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'
+                              : 'text-[#CF1F2E] dark:text-[#F87171] hover:text-[#B71825] dark:hover:text-[#EF4444]'
                           }`}
                         >
                           more
@@ -300,11 +300,11 @@ export default function AgentDashboard({ isActive }) {
                     <div>
                       <div className="flex items-center justify-between font-bold text-zinc-500 dark:text-zinc-400 mb-1">
                         <span className="uppercase tracking-wider">Session Tokens</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-bold">{sessionTotal.toLocaleString()}</span>
+                        <span className="text-[#CF1F2E] dark:text-[#F87171] font-bold">{sessionTotal.toLocaleString()}</span>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
                         <div className="flex items-center space-x-1 text-zinc-600 dark:text-zinc-400">
-                          <ArrowDownRight size={11} className="text-blue-500 flex-shrink-0" />
+                          <ArrowDownRight size={11} className="text-[#CF1F2E] flex-shrink-0" />
                           <span>In: <strong className="text-zinc-800 dark:text-zinc-200">{sessionPrompt.toLocaleString()}</strong></span>
                         </div>
                         <div className="flex items-center space-x-1 text-zinc-600 dark:text-zinc-400">
@@ -393,7 +393,7 @@ export default function AgentDashboard({ isActive }) {
                         {info.role}{" "}
                         <button 
                           onClick={() => setSelectedAgent({ name, info, metrics: agentMetrics })}
-                          className="inline-flex items-center text-blue-500 hover:underline font-semibold ml-1 cursor-pointer"
+                          className="inline-flex items-center text-[#CF1F2E] hover:underline font-semibold ml-1 cursor-pointer"
                         >
                           more
                         </button>
@@ -440,7 +440,7 @@ function StatCard({ title, value, subtext, sessionBadge, icon: Icon, color = "te
       {(subtext || sessionBadge) && (
         <div className="space-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800/60 text-[10px]">
           {subtext && <div className="text-zinc-500 dark:text-zinc-400 truncate">{subtext}</div>}
-          {sessionBadge && <div className="text-blue-600 dark:text-blue-400 font-semibold">{sessionBadge}</div>}
+          {sessionBadge && <div className="text-[#CF1F2E] dark:text-[#F87171] font-semibold">{sessionBadge}</div>}
         </div>
       )}
     </div>

@@ -193,7 +193,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
             <button
               onClick={handleManualScan}
               disabled={isScanning}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#CF1F2E] hover:bg-[#B71825] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs disabled:opacity-50"
             >
               <Zap size={13} className={isScanning ? "animate-spin" : ""} />
               <span>{isScanning ? "Scanning..." : "Trigger Proactive Sweep"}</span>
@@ -227,18 +227,18 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
           <div className="p-5 sm:p-6 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-[#111114]/80 shadow-xs space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800/80">
               <div className="flex items-center space-x-2">
-                <Database size={15} className="text-blue-500" />
+                <Database size={15} className="text-[#CF1F2E]" />
                 <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
                   Connect to WMS
                 </span>
               </div>
             </div>
 
-            <form onSubmit={handleConnect} className="space-y-4">
+            <form onSubmit={handleSaveAndConnect} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2 space-y-1">
                   <label className="text-[10px] text-zinc-500 font-semibold uppercase">
-                    Host / IP Address *
+                    Oracle Host / Endpoint *
                   </label>
                   <input
                     type="text"
@@ -246,7 +246,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     placeholder="e.g. oracle-dev.company.corp"
                     value={formData.host}
                     onChange={e => handleFieldChange('host', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-[#CF1F2E]"
                   />
                 </div>
 
@@ -259,7 +259,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     required
                     value={formData.port}
                     onChange={e => handleFieldChange('port', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-[#CF1F2E]"
                   />
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     placeholder="e.g. WMSDEV or ORCL"
                     value={formData.service_name}
                     onChange={e => handleFieldChange('service_name', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-[#CF1F2E]"
                   />
                 </div>
 
@@ -288,7 +288,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     placeholder="e.g. WMSSCHEMA"
                     value={formData.schema_name}
                     onChange={e => handleFieldChange('schema_name', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-[#CF1F2E]"
                   />
                 </div>
               </div>
@@ -304,7 +304,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     placeholder="e.g. yonder_sentinel_ro"
                     value={formData.user}
                     onChange={e => handleFieldChange('user', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-[#CF1F2E]"
                   />
                 </div>
 
@@ -318,7 +318,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                     placeholder="••••••••••••"
                     value={formData.password}
                     onChange={e => handleFieldChange('password', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-hidden focus:border-[#CF1F2E]"
                   />
                 </div>
               </div>
@@ -350,7 +350,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                   disabled={isTesting || !formData.host || !formData.service_name || !formData.user || !formData.password}
                   className="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
                 >
-                  <RefreshCw size={13} className={isTesting ? "animate-spin text-blue-500" : ""} />
+                  <RefreshCw size={13} className={isTesting ? "animate-spin text-[#CF1F2E]" : ""} />
                   <span>{isTesting ? "Testing Live Handshake..." : "Test Connection ⚡"}</span>
                 </button>
 
@@ -364,11 +364,11 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                   }
                   className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-xs ${
                     testResult?.success && !isLoading
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+                      ? 'bg-[#CF1F2E] hover:bg-[#B71825] text-white cursor-pointer'
                       : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed opacity-60'
                   }`}
                 >
-                  <Radar size={13} className={testResult?.success ? "animate-pulse text-blue-200" : ""} />
+                  <Radar size={13} className={testResult?.success ? "animate-pulse text-white" : ""} />
                   <span>{isLoading ? "Connecting..." : "Save & Activate Sentinel"}</span>
                 </button>
               </div>
@@ -407,7 +407,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
             <div className="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-[#111114]/70 shadow-xs space-y-1">
               <div className="flex items-center justify-between text-zinc-500">
                 <span className="text-[10.5px] uppercase font-bold">Outbound Waves</span>
-                <Boxes size={14} className="text-blue-500" />
+                <Boxes size={14} className="text-[#CF1F2E]" />
               </div>
               <div className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
                 {alerts.filter(a => a.domain === 'Outbound').length > 0 ? (
@@ -495,7 +495,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                         <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
                           item.severity === 'CRITICAL' ? 'bg-rose-500/10 text-rose-600 border border-rose-500/20' :
                           item.severity === 'HIGH' ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' :
-                          'bg-blue-500/10 text-blue-600 border border-blue-500/20'
+                          'bg-[#CF1F2E]/10 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/20'
                         }`}>
                           {item.severity}
                         </span>
@@ -536,7 +536,7 @@ export default function SentinelView({ isActive, onNavigateToSession }) {
                       <button
                         onClick={() => handleAutoTriage(item)}
                         disabled={triagingAlertId === item.id}
-                        className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                        className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-[#CF1F2E] hover:bg-[#B71825] text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
                       >
                         <Zap size={12} className={triagingAlertId === item.id ? "animate-spin" : ""} />
                         <span>{triagingAlertId === item.id ? "Running 7-Agent Squad..." : "Investigate in Copilot ⚡"}</span>

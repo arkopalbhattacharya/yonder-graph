@@ -66,7 +66,7 @@ export default function FeedbackModal({ isOpen, onClose, feedbackId, onSubmitSuc
         
         {/* Body */}
         <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
-          <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 p-4 rounded-lg text-sm border border-blue-200 dark:border-blue-800/50">
+          <div className="mb-6 bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] p-4 rounded-lg text-sm border border-[#CF1F2E]/25 dark:border-[#CF1F2E]/30">
             <h4 className="font-semibold mb-1">Human-in-the-Loop Quality Gate</h4>
             <p>Your corrections will be evaluated by the Enrichment Agent. The updated SOP must achieve a 90% confidence score and pass Oracle SQL Tier 2 validation before it is patched into the Neo4j Knowledge Graph.</p>
           </div>

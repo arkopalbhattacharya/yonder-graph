@@ -188,16 +188,24 @@ export default function GraphVisualizer({ isActive }) {
 
   const getNodeColor = (node) => {
     if (node.color) return node.color;
-    const colors = {
-      Domain: '#10b981',       // Emerald
-      Table: '#3b82f6',        // Blue
-      Column: '#ec4899',       // Pink (same as previous business term color)
-      SOPRunbook: '#eab308',   // Yellow
-      BusinessFlow: '#94a3b8', // Slate Grey (Light)
-      BusinessTerm: '#64748b', // Slate Grey (Medium/Dark)
-      BYConfig: '#ef4444'      // Red
+    const colors = isDarkMode ? {
+      Domain: '#14B8A6',       // MIK Maker Teal
+      Table: '#38BDF8',        // MIK Studio Blue
+      Column: '#FB7185',       // MIK Coral/Peach
+      SOPRunbook: '#FBBF24',   // MIK Craft Gold/Amber
+      BusinessFlow: '#94A3B8', // Slate Grey (Light)
+      BusinessTerm: '#64748B', // Slate Grey (Medium/Dark)
+      BYConfig: '#F87171'      // MIK Crimson/Red
+    } : {
+      Domain: '#009783',       // MIK Maker Teal
+      Table: '#0475BC',        // MIK Studio Blue
+      Column: '#ED7064',       // MIK Coral/Peach
+      SOPRunbook: '#D97706',   // MIK Craft Gold/Amber
+      BusinessFlow: '#757575', // Slate Grey (Light)
+      BusinessTerm: '#5F5F5F', // Slate Grey (Medium/Dark)
+      BYConfig: '#CF1F2E'      // MIK Michaels Red
     };
-    return colors[node.label] || '#64748b';
+    return colors[node.label] || (isDarkMode ? '#64748B' : '#757575');
   };
 
   // ── Calculate Focus & Fade-out Sets for Node Selection or Search ──
@@ -286,7 +294,7 @@ export default function GraphVisualizer({ isActive }) {
       ctx.beginPath();
       ctx.arc(node.x, node.y, r + (3.5 / globalScale), 0, 2 * Math.PI, false);
       ctx.lineWidth = 2.5 / globalScale;
-      ctx.strokeStyle = isSelected ? '#3b82f6' : '#f59e0b';
+      ctx.strokeStyle = isSelected ? (isDarkMode ? '#F87171' : '#CF1F2E') : '#EBAB33';
       ctx.stroke();
     }
 
@@ -296,7 +304,7 @@ export default function GraphVisualizer({ isActive }) {
     ctx.fillStyle = getNodeColor(node);
     ctx.fill();
     ctx.lineWidth = 1.2 / globalScale;
-    ctx.strokeStyle = isDarkMode ? '#18181b' : '#ffffff';
+    ctx.strokeStyle = isDarkMode ? '#18181C' : '#ffffff';
     ctx.stroke();
 
     // Zoom-adaptive font size: scales smoothly without overpowering canvas
@@ -491,7 +499,7 @@ export default function GraphVisualizer({ isActive }) {
               onClick={() => setViewMode(m.id)}
               className={`px-2 py-0.5 rounded-lg transition-all ${
                 viewMode === m.id
-                  ? 'bg-blue-600 text-white font-bold shadow-2xs'
+                  ? 'bg-[#CF1F2E] text-white font-bold shadow-2xs'
                   : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
               }`}
             >
@@ -503,7 +511,7 @@ export default function GraphVisualizer({ isActive }) {
       </div>
 
       {/* ── Zoom & Fit Action Buttons ── */}
-      <div className="absolute top-3.5 right-3.5 z-10 flex flex-col space-y-1.5">
+      <div className="absolute top-3.5 right-4 z-10 flex flex-col space-y-1.5">
         <div className="bg-white/90 dark:bg-[#111114]/90 backdrop-blur-md rounded-xl flex flex-col border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden text-xs">
           <button onClick={handleZoomIn} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors border-b border-zinc-200 dark:border-zinc-800" title="Zoom In">
             <ZoomIn size={15} className="text-zinc-600 dark:text-zinc-300" />
@@ -578,9 +586,9 @@ export default function GraphVisualizer({ isActive }) {
                       <div 
                         key={idx}
                         onClick={() => handleFocusNode(rel.target)}
-                        className="p-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between text-[11px] cursor-pointer hover:border-blue-500 transition-colors"
+                        className="p-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between text-[11px] cursor-pointer hover:border-[#CF1F2E] transition-colors"
                       >
-                        <span className="text-blue-600 dark:text-blue-400 font-bold">[{rel.relationship}]</span>
+                        <span className="text-[#CF1F2E] dark:text-[#F87171] font-bold">[{rel.relationship}]</span>
                         <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{rel.target.name} →</span>
                       </div>
                     ))}
@@ -588,10 +596,10 @@ export default function GraphVisualizer({ isActive }) {
                       <div 
                         key={idx}
                         onClick={() => handleFocusNode(rel.source)}
-                        className="p-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between text-[11px] cursor-pointer hover:border-blue-500 transition-colors"
+                        className="p-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between text-[11px] cursor-pointer hover:border-[#CF1F2E] transition-colors"
                       >
                         <span className="text-zinc-700 dark:text-zinc-300 font-semibold">← {rel.source.name}</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-bold">[{rel.relationship}]</span>
+                        <span className="text-[#CF1F2E] dark:text-[#F87171] font-bold">[{rel.relationship}]</span>
                       </div>
                     ))}
                   </div>
@@ -665,7 +673,7 @@ export default function GraphVisualizer({ isActive }) {
               <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800/80 space-y-1.5 text-[11px]">
                 <div className="flex justify-between">
                   <span className="text-zinc-400">Parent Table</span>
-                  <span className="font-bold text-blue-600 dark:text-blue-400">
+                  <span className="font-bold text-[#CF1F2E] dark:text-[#F87171]">
                     {selectedNode.props?.table_name}
                   </span>
                 </div>
@@ -694,7 +702,7 @@ export default function GraphVisualizer({ isActive }) {
               {nodeHierarchy?.targetTables?.length > 0 && (
                 <button
                   onClick={() => handleFocusNode(nodeHierarchy.targetTables[0])}
-                  className="w-full py-1.5 px-3 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 font-bold text-xs flex items-center justify-center space-x-1 transition-colors"
+                  className="w-full py-1.5 px-3 rounded-lg bg-[#CF1F2E]/10 hover:bg-[#CF1F2E]/20 dark:bg-[#CF1F2E]/20 dark:hover:bg-[#CF1F2E]/30 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40 font-bold text-xs flex items-center justify-center space-x-1 transition-colors"
                 >
                   <span>Focus Parent Table ({nodeHierarchy.targetTables[0].name})</span>
                   <ArrowRight size={12} />
@@ -741,7 +749,7 @@ export default function GraphVisualizer({ isActive }) {
                     <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Diagnostic SQL</span>
                     <button 
                       onClick={() => copyToClipboard(selectedNode.props.diagnostic_sql)}
-                      className="text-[10px] text-zinc-400 hover:text-blue-500 flex items-center space-x-1"
+                      className="text-[10px] text-zinc-400 hover:text-[#CF1F2E] flex items-center space-x-1"
                     >
                       {copiedSql ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
                       <span>{copiedSql ? 'Copied' : 'Copy'}</span>
@@ -770,7 +778,7 @@ export default function GraphVisualizer({ isActive }) {
                       <span 
                         key={tbl.id} 
                         onClick={() => handleFocusNode(tbl)}
-                        className="px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 font-bold text-[10px] cursor-pointer hover:bg-blue-100 transition-colors"
+                        className="px-2 py-1 rounded-md bg-[#CF1F2E]/10 dark:bg-[#CF1F2E]/20 text-[#CF1F2E] dark:text-[#F87171] border border-[#CF1F2E]/30 dark:border-[#F87171]/40 font-bold text-[10px] cursor-pointer hover:bg-[#CF1F2E]/20 transition-colors"
                       >
                         {tbl.name}
                       </span>
@@ -809,12 +817,13 @@ export default function GraphVisualizer({ isActive }) {
           </h4>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
             {[
-              { label: 'Domain', color: '#10b981' },
-              { label: 'Table', color: '#3b82f6' },
-              { label: 'Column', color: '#ec4899' },
-              { label: 'SOP Runbook', color: '#eab308' },
-              { label: 'Business Flow', color: '#94a3b8' },
-              { label: 'Business Term', color: '#64748b' },
+              { label: 'Domain', color: isDarkMode ? '#14B8A6' : '#009783' },
+              { label: 'Table', color: isDarkMode ? '#38BDF8' : '#0475BC' },
+              { label: 'Column', color: isDarkMode ? '#FB7185' : '#ED7064' },
+              { label: 'SOP Runbook', color: isDarkMode ? '#FBBF24' : '#D97706' },
+              { label: 'BY Config', color: isDarkMode ? '#F87171' : '#CF1F2E' },
+              { label: 'Business Flow', color: isDarkMode ? '#94A3B8' : '#757575' },
+              { label: 'Business Term', color: isDarkMode ? '#64748B' : '#5F5F5F' },
             ].map(item => (
               <div key={item.label} className="flex items-center space-x-1.5">
                 <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
@@ -827,14 +836,14 @@ export default function GraphVisualizer({ isActive }) {
 
       {/* ── Main Canvas View ── */}
       {loading ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-[#09090b] z-0">
+        <div className="absolute inset-0 flex items-center justify-center bg-[#F8F8F9] dark:bg-[#0F0F12] z-0">
           <div className="flex flex-col items-center">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-2 border-[#CF1F2E] border-t-transparent rounded-full animate-spin"></div>
             <p className="mt-3 text-xs text-zinc-500 font-mono">Loading WMS Knowledge Graph...</p>
           </div>
         </div>
       ) : (
-        <div className="absolute inset-0 z-0 bg-zinc-50 dark:bg-[#09090b]">
+        <div className="absolute inset-0 z-0 bg-[#F8F8F9] dark:bg-[#0F0F12]">
           {isActive && filteredGraphData.nodes.length > 0 && (
             <ForceGraph2D
               ref={fgRef}

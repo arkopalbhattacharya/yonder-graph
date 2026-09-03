@@ -791,7 +791,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
             <div className="w-full pb-2">
               <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter font-mono text-zinc-900 dark:text-zinc-100 select-none inline-flex items-baseline justify-center">
                 <span>yonder</span>
-                <span className="cursor-flicker text-blue-600 dark:text-blue-400 font-extrabold inline-block mx-[0.5px]">_</span>
+                <span className="cursor-flicker text-[#CF1F2E] dark:text-[#F87171] font-extrabold inline-block mx-[0.5px]">_</span>
                 <span>graph</span>
               </h1>
             </div>
@@ -851,7 +851,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
                         onClick={() => handleSwitchPersona('ask')}
                         className={`px-2.5 py-0.5 rounded-md text-[10.5px] font-mono transition-all cursor-pointer ${
                           persona === 'ask'
-                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
+                            ? 'bg-[#CF1F2E] text-white font-semibold shadow-2xs'
                             : 'text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300'
                         }`}
                       >
@@ -862,7 +862,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
                         onClick={() => handleSwitchPersona('resolve')}
                         className={`px-2.5 py-0.5 rounded-md text-[10.5px] font-mono transition-all cursor-pointer ${
                           persona === 'resolve'
-                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
+                            ? 'bg-[#CF1F2E] text-white font-semibold shadow-2xs'
                             : 'text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300'
                         }`}
                       >
@@ -1091,7 +1091,7 @@ export default function CopilotChat({ isActive, initialPersona = 'ask', sessionI
 const chatMarkdownComponents = {
   h1: ({ children }) => <h1 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mt-3.5 mb-1.5 pb-1 border-b border-zinc-200 dark:border-zinc-800">{children}</h1>,
   h2: ({ children }) => <h2 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 mt-3 mb-1.5 pb-1 border-b border-zinc-200/60 dark:border-zinc-800/60">{children}</h2>,
-  h3: ({ children }) => <h3 className="text-xs font-bold text-blue-600 dark:text-blue-400 mt-2.5 mb-1">{children}</h3>,
+  h3: ({ children }) => <h3 className="text-xs font-bold text-[#CF1F2E] dark:text-[#F87171] mt-2.5 mb-1">{children}</h3>,
   h4: ({ children }) => <h4 className="text-[11.5px] font-bold text-zinc-700 dark:text-zinc-300 mt-2 mb-1">{children}</h4>,
   p: ({ children }) => <p className="mb-2.5 last:mb-0 leading-relaxed text-zinc-800 dark:text-zinc-200">{children}</p>,
   ul: ({ children }) => <ul className="list-disc list-outside pl-4 mb-2.5 space-y-1 text-zinc-800 dark:text-zinc-200">{children}</ul>,
@@ -1120,12 +1120,12 @@ const chatMarkdownComponents = {
       );
     }
     return (
-      <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-mono text-[11px] border border-zinc-200 dark:border-zinc-700" {...props}>
+      <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[#CF1F2E] dark:text-[#F87171] font-mono text-[11px] border border-zinc-200 dark:border-zinc-700" {...props}>
         {children}
       </code>
     );
   },
-  blockquote: ({ children }) => <blockquote className="border-l-2 border-blue-500 pl-3 py-1 my-2 bg-blue-50/40 dark:bg-blue-950/20 text-zinc-700 dark:text-zinc-300 italic rounded-r">{children}</blockquote>,
+  blockquote: ({ children }) => <blockquote className="border-l-2 border-[#CF1F2E] pl-3 py-1 my-2 bg-[#CF1F2E]/5 dark:bg-[#CF1F2E]/10 text-zinc-700 dark:text-zinc-300 italic rounded-r">{children}</blockquote>,
 };
 
 function PersonaSummaryCard({ content, msgPersona }) {
@@ -1147,7 +1147,7 @@ function PersonaSummaryCard({ content, msgPersona }) {
       {hasMultiplePersonas && (
         <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100 dark:border-zinc-800/60">
           <div className="flex items-center space-x-1.5 text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
-            <Layers size={13} className="text-blue-500" />
+            <Layers size={13} className="text-[#CF1F2E]" />
             <span className="text-[10px] uppercase font-bold tracking-wider">Summary Perspective:</span>
           </div>
           <div className="inline-flex p-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[10px] font-mono">
@@ -1156,7 +1156,7 @@ function PersonaSummaryCard({ content, msgPersona }) {
               onClick={() => setSelectedPersona('l1')}
               className={`px-2.5 py-0.5 rounded-md font-medium transition-all cursor-pointer ${
                 selectedPersona === 'l1'
-                  ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 font-bold shadow-2xs'
+                  ? 'bg-[#CF1F2E] text-white font-bold shadow-2xs'
                   : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
               title="L1 Floor Operations & Service Desk View"
@@ -1168,7 +1168,7 @@ function PersonaSummaryCard({ content, msgPersona }) {
               onClick={() => setSelectedPersona('l2')}
               className={`px-2.5 py-0.5 rounded-md font-medium transition-all cursor-pointer ${
                 selectedPersona === 'l2'
-                  ? 'bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-bold shadow-2xs'
+                  ? 'bg-[#CF1F2E] text-white font-bold shadow-2xs'
                   : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
               title="L2 Application Support Engineers View"
@@ -1180,7 +1180,7 @@ function PersonaSummaryCard({ content, msgPersona }) {
               onClick={() => setSelectedPersona('l3')}
               className={`px-2.5 py-0.5 rounded-md font-medium transition-all cursor-pointer ${
                 selectedPersona === 'l3'
-                  ? 'bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-bold shadow-2xs'
+                  ? 'bg-[#CF1F2E] text-white font-bold shadow-2xs'
                   : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
               title="L3 SME / DBAs View"
@@ -1408,11 +1408,11 @@ function SequentialStepPrinter({ step, idx, isCurrent, isCompleted }) {
       <div className="flex items-center justify-between text-xs -ml-[21px]">
         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
           {isCompleted ? (
-            <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0 bg-surface-light dark:bg-[#09090b]" />
+            <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0 bg-surface-light dark:bg-surface-dark" />
           ) : (
-            <div className="w-3.5 h-3.5 rounded-full border-2 border-blue-500 border-t-transparent animate-spin flex-shrink-0 bg-surface-light dark:bg-[#09090b]" />
+            <div className="w-3.5 h-3.5 rounded-full border-2 border-[#CF1F2E] border-t-transparent animate-spin flex-shrink-0 bg-surface-light dark:bg-surface-dark" />
           )}
-          <span className={`font-bold ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-700 dark:text-zinc-300'}`}>
+          <span className={`font-bold ${isCurrent ? 'text-[#CF1F2E] dark:text-[#F87171]' : 'text-zinc-700 dark:text-zinc-300'}`}>
             Step {idx + 1}: {isCurrent && activeLine === 0 ? (
               <TypewriterText 
                 text={step.title} 
@@ -1493,7 +1493,7 @@ function LiveHierarchicalTimeline({ steps, onStop }) {
       {/* Header bar */}
       <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-200/50 dark:border-zinc-800/50">
         <div className="flex items-center space-x-2">
-          <Loader2 size={13} className="animate-spin text-blue-500" />
+          <Loader2 size={13} className="animate-spin text-[#CF1F2E]" />
           <span className="font-bold text-zinc-700 dark:text-zinc-300 text-xs">
             Multi-Agent Real-Time Execution
           </span>
@@ -1687,7 +1687,7 @@ function UserMessageContent({ text }) {
       <button
         type="button"
         onClick={handleCopy}
-        className="absolute right-0 bottom-0 opacity-0 group-hover/user-content:opacity-100 p-1 rounded-md bg-zinc-200/90 hover:bg-zinc-300 dark:bg-zinc-800/90 dark:hover:bg-zinc-700 text-zinc-600 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 border border-zinc-300 dark:border-zinc-700 shadow-2xs transition-all duration-150 cursor-pointer"
+        className="absolute right-0 bottom-0 opacity-0 group-hover/user-content:opacity-100 p-1 rounded-md bg-zinc-200/90 hover:bg-zinc-300 dark:bg-zinc-800/90 dark:hover:bg-zinc-700 text-zinc-600 hover:text-[#CF1F2E] dark:text-zinc-400 dark:hover:text-[#F87171] border border-zinc-300 dark:border-zinc-700 shadow-2xs transition-all duration-150 cursor-pointer"
         title={copied ? "Copied query!" : "Copy user query"}
       >
         {copied ? (
@@ -1736,7 +1736,7 @@ function TypewriterText({ text, speed = 12, onComplete }) {
     <span>
       {text ? text.slice(0, displayedLength) : ''}
       {isTyping && (
-        <span className="inline-block w-1.5 h-3 bg-blue-500 ml-0.5 animate-pulse align-middle" />
+        <span className="inline-block w-1.5 h-3 bg-[#CF1F2E] ml-0.5 animate-pulse align-middle" />
       )}
     </span>
   );
@@ -1813,7 +1813,7 @@ function TypewriterMarkdown({ text, isNew = false, charSpeed = 8, lineDelay = 26
       </ReactMarkdown>
 
       {isTyping && (
-        <span className="inline-block w-1.5 h-3.5 bg-blue-500 ml-0.5 animate-pulse align-middle" />
+        <span className="inline-block w-1.5 h-3.5 bg-[#CF1F2E] ml-0.5 animate-pulse align-middle" />
       )}
     </div>
   );
@@ -1962,7 +1962,7 @@ function DynamicCheckpointScroller({ containerRef, messages = [], isLoading }) {
       <button
         type="button"
         onClick={() => scrollStep('up')}
-        className="w-6 h-6 flex items-center justify-center text-zinc-500 hover:text-blue-500 dark:text-zinc-400 dark:hover:text-blue-400 hover:scale-125 active:scale-90 transition-all cursor-pointer bg-transparent border-0 outline-none p-0"
+        className="w-6 h-6 flex items-center justify-center text-zinc-500 hover:text-[#CF1F2E] dark:text-zinc-400 dark:hover:text-[#F87171] hover:scale-125 active:scale-90 transition-all cursor-pointer bg-transparent border-0 outline-none p-0"
         title="Previous Checkpoint"
       >
         <ChevronUp size={16} className="stroke-[2.5]" />
@@ -1975,7 +1975,7 @@ function DynamicCheckpointScroller({ containerRef, messages = [], isLoading }) {
       >
         {/* Dynamic Scroll Progress Thumb */}
         <div 
-          className="absolute w-[9px] -left-[2px] h-8 rounded-full bg-zinc-400/90 dark:bg-zinc-500 group-hover:bg-blue-500 shadow-xs transition-colors pointer-events-none"
+          className="absolute w-[9px] -left-[2px] h-8 rounded-full bg-zinc-400/90 dark:bg-zinc-500 group-hover:bg-[#CF1F2E] shadow-xs transition-colors pointer-events-none"
           style={{
             top: `calc(${scrollProgress * 100}% - ${scrollProgress * 32}px)`
           }}
@@ -1987,7 +1987,7 @@ function DynamicCheckpointScroller({ containerRef, messages = [], isLoading }) {
           const isAgentLoop = cp.role === 'agent-loop';
           const isLive = cp.role === 'live-process' || cp.id === 'live-process';
 
-          let dotClass = 'bg-blue-500 dark:bg-blue-500 border-blue-400 dark:border-blue-400 group-hover/dot:bg-blue-600 shadow-xs';
+          let dotClass = 'bg-[#CF1F2E] dark:bg-[#CF1F2E] border-[#B71825] dark:border-[#F87171] group-hover/dot:bg-[#B71825] shadow-xs';
 
           if (isUser) {
             dotClass = 'bg-zinc-300 dark:bg-zinc-700 border-zinc-400 dark:border-zinc-500 group-hover/dot:border-zinc-800 dark:group-hover/dot:border-zinc-200 group-hover/dot:bg-zinc-900 dark:group-hover/dot:bg-zinc-100';
@@ -2031,7 +2031,7 @@ function DynamicCheckpointScroller({ containerRef, messages = [], isLoading }) {
       <button
         type="button"
         onClick={() => scrollStep('down')}
-        className="w-6 h-6 flex items-center justify-center text-zinc-500 hover:text-blue-500 dark:text-zinc-400 dark:hover:text-blue-400 hover:scale-125 active:scale-90 transition-all cursor-pointer bg-transparent border-0 outline-none p-0"
+        className="w-6 h-6 flex items-center justify-center text-zinc-500 hover:text-[#CF1F2E] dark:text-zinc-400 dark:hover:text-[#F87171] hover:scale-125 active:scale-90 transition-all cursor-pointer bg-transparent border-0 outline-none p-0"
         title="Next Checkpoint"
       >
         <ChevronDown size={16} className="stroke-[2.5]" />
