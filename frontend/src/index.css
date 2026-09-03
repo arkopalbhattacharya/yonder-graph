@@ -75,4 +75,93 @@
   .badge-gray {
     @apply bg-zinc-100 text-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60;
   }
+
+  @keyframes cursorFlicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .cursor-flicker {
+    animation: cursorFlicker 1s step-start infinite;
+  }
+
+  /* Markdown Prose Typography & Element Styling */
+  .markdown-prose {
+    @apply text-zinc-800 dark:text-zinc-200 font-sans;
+  }
+
+  .markdown-prose h1,
+  .markdown-prose h2,
+  .markdown-prose h3,
+  .markdown-prose h4 {
+    @apply font-bold text-zinc-900 dark:text-zinc-100 mt-3.5 mb-1.5 tracking-tight font-sans;
+  }
+
+  .markdown-prose h1 {
+    @apply text-sm pb-1 border-b border-zinc-200 dark:border-zinc-800;
+  }
+
+  .markdown-prose h2 {
+    @apply text-xs pb-1 border-b border-zinc-200/60 dark:border-zinc-800/60 text-zinc-900 dark:text-zinc-100;
+  }
+
+  .markdown-prose h3 {
+    @apply text-[11.5px] text-blue-600 dark:text-blue-400;
+  }
+
+  .markdown-prose h4 {
+    @apply text-[11px] text-zinc-700 dark:text-zinc-300;
+  }
+
+  .markdown-prose p {
+    @apply mb-2 last:mb-0 leading-relaxed;
+  }
+
+  .markdown-prose ul {
+    @apply list-disc list-outside pl-4 mb-2 space-y-0.5 text-zinc-700 dark:text-zinc-300;
+  }
+
+  .markdown-prose ol {
+    @apply list-decimal list-outside pl-4 mb-2 space-y-0.5 text-zinc-700 dark:text-zinc-300;
+  }
+
+  .markdown-prose li {
+    @apply leading-relaxed;
+  }
+
+  .markdown-prose table {
+    @apply w-full my-2.5 border-collapse rounded border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono;
+  }
+
+  .markdown-prose thead {
+    @apply bg-zinc-100 dark:bg-zinc-800/90 text-zinc-800 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700;
+  }
+
+  .markdown-prose th {
+    @apply px-2.5 py-1.5 text-left font-bold text-[10px] uppercase tracking-wider text-zinc-700 dark:text-zinc-300;
+  }
+
+  .markdown-prose td {
+    @apply px-2.5 py-1 border-t border-zinc-100 dark:border-zinc-800/60 text-zinc-700 dark:text-zinc-300;
+  }
+
+  .markdown-prose tbody tr:hover {
+    @apply bg-zinc-50/80 dark:bg-zinc-800/30 transition-colors;
+  }
+
+  .markdown-prose code {
+    @apply px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-mono text-[11px] border border-zinc-200 dark:border-zinc-700;
+  }
+
+  .markdown-prose pre {
+    @apply my-2 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-2.5 overflow-x-auto text-[11px] font-mono text-zinc-800 dark:text-zinc-200 leading-relaxed;
+  }
+
+  .markdown-prose pre code {
+    @apply p-0 bg-transparent border-0 text-inherit;
+  }
+
+  .markdown-prose blockquote {
+    @apply border-l-2 border-blue-500 pl-3 py-1 my-2 bg-blue-50/40 dark:bg-blue-950/20 text-zinc-700 dark:text-zinc-300 italic rounded-r;
+  }
 }

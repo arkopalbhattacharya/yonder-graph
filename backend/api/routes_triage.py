@@ -33,6 +33,10 @@ class TriageRequest(BaseModel):
         default="resolve",
         description="Active agent persona: 'resolve' (ResolveTriageAgent) or 'ask' (AskProcessAgent)",
     )
+    enable_followup: Optional[bool] = Field(
+        default=False,
+        description="Experimental feature flag for multi-turn follow-up queries via ContextManagementAgent",
+    )
 
 
 class ConsolidateSQLRequest(BaseModel):
@@ -51,6 +55,7 @@ def run_triage(request: TriageRequest, db: Session = Depends(get_db)):
             query=request.query,
             session_id=request.session_id,
             persona=request.persona,
+            enable_followup=bool(request.enable_followup),
         )
         
         # Persist conversation turn in PostgreSQL
@@ -70,6 +75,56 @@ def run_triage(request: TriageRequest, db: Session = Depends(get_db)):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/triage/stream")
+def run_triage_stream(request: TriageRequest, db: Session = Depends(get_db)):
+    """
+    Execute multi-agent diagnosis and stream real-time Server-Sent Events (SSE).
+    """
+    from fastapi.responses import StreamingResponse
+    import json
+
+    def event_generator():
+        final_payload = None
+        for frame in orchestrator.run_triage_stream(
+            query=request.query,
+            session_id=request.session_id,
+            persona=request.persona,
+            enable_followup=bool(request.enable_followup),
+        ):
+            event_name = frame.get("event", "message")
+            event_data = frame.get("data", {})
+            if event_name == "final_payload":
+                final_payload = event_data
+
+            payload_str = json.dumps(event_data)
+            yield f"event: {event_name}\ndata: {payload_str}\n\n"
+
+        # Persist conversation turn in PostgreSQL when stream finishes
+        if final_payload:
+            try:
+                active_session_id = final_payload.get("session_id") or request.session_id
+                if active_session_id:
+                    record_chat_turn(
+                        session_id=active_session_id,
+                        user_query=request.query,
+                        assistant_payload=final_payload,
+                        db=db,
+                    )
+            except Exception as persist_err:
+                import logging
+                logging.getLogger(__name__).warning("Chat persistence skipped: %s", persist_err)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.post("/triage/consolidate-sql")

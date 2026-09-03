@@ -32,12 +32,69 @@ export const api = {
   checkHealth: () => fetchWithHandle(`${API_BASE}/health`),
   
   // ── Triage ──
-  runTriage: (query, sessionId = null, persona = 'ask', signal = null) => 
+  runTriage: (query, sessionId = null, persona = 'ask', signal = null, enableFollowup = false) => 
     fetchWithHandle(`${API_BASE}/triage`, {
       method: 'POST',
-      body: JSON.stringify({ query, session_id: sessionId, persona }),
+      body: JSON.stringify({ query, session_id: sessionId, persona, enable_followup: enableFollowup }),
       signal: signal || undefined,
     }),
+  streamTriage: async (query, sessionId = null, persona = 'ask', onEvent = () => {}, signal = null, enableFollowup = false) => {
+    const response = await fetch(`${API_BASE}/triage/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query, session_id: sessionId, persona, enable_followup: enableFollowup }),
+      signal: signal || undefined,
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || errData.error || `HTTP ${response.status}: Stream Failed`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let finalPayload = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const blocks = buffer.split('\n\n');
+      buffer = blocks.pop() || '';
+
+      for (const block of blocks) {
+        if (!block.trim()) continue;
+        let eventType = 'message';
+        let dataStr = '';
+
+        for (const line of block.split('\n')) {
+          if (line.startsWith('event: ')) {
+            eventType = line.slice(7).trim();
+          } else if (line.startsWith('data: ')) {
+            dataStr = line.slice(6);
+          }
+        }
+
+        if (dataStr) {
+          try {
+            const parsedData = JSON.parse(dataStr);
+            if (eventType === 'final_payload') {
+              finalPayload = parsedData;
+            }
+            onEvent({ event: eventType, data: parsedData });
+          } catch (jsonErr) {
+            console.warn('Failed to parse SSE JSON frame:', jsonErr);
+          }
+        }
+      }
+    }
+
+    return finalPayload;
+  },
   consolidateSQL: (steps, sessionId = null, signal = null) =>
     fetchWithHandle(`${API_BASE}/triage/consolidate-sql`, {
       method: 'POST',
@@ -60,6 +117,7 @@ export const api = {
     return fetchWithHandle(`${API_BASE}/audit/logs?${params.toString()}`);
   },
   getAuditStats: () => fetchWithHandle(`${API_BASE}/audit/stats`),
+  getDashboardMetrics: () => fetchWithHandle(`${API_BASE}/audit/dashboard-metrics`),
   
   // ── Feedback & Corrections ──
   submitFeedback: (payload) => 
@@ -83,6 +141,12 @@ export const api = {
     
   // ── Governance ──
   getGovernancePolicy: () => fetchWithHandle(`${API_BASE}/governance/policy`),
+  getGovernanceInterceptions: (page = 1, pageSize = 25, filters = {}) => {
+    const params = new URLSearchParams({ page, page_size: pageSize });
+    if (filters.status) params.append('status', filters.status);
+    if (filters.risk_level) params.append('risk_level', filters.risk_level);
+    return fetchWithHandle(`${API_BASE}/governance/interceptions?${params.toString()}`);
+  },
 
   // ── Chat History & Sessions ──
   getChatSessions: () => fetchWithHandle(`${API_BASE}/chat/sessions`),
@@ -119,4 +183,40 @@ export const api = {
     }
     return data;
   },
+
+  // ── Predictive Supply Chain Sentinel ──
+  getSentinelStatus: () => fetchWithHandle(`${API_BASE}/sentinel/status`),
+  testOracleConnection: (payload) =>
+    fetchWithHandle(`${API_BASE}/sentinel/test-connection`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  connectOracle: (payload) =>
+    fetchWithHandle(`${API_BASE}/sentinel/connect`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  disconnectOracle: () =>
+    fetchWithHandle(`${API_BASE}/sentinel/disconnect`, {
+      method: 'POST',
+    }),
+  getSentinelAlerts: () => fetchWithHandle(`${API_BASE}/sentinel/alerts`),
+  runSentinelScan: () =>
+    fetchWithHandle(`${API_BASE}/sentinel/scan`, {
+      method: 'POST',
+    }),
+  autoTriageAlert: (alertId) =>
+    fetchWithHandle(`${API_BASE}/sentinel/auto-triage/${alertId}`, {
+      method: 'POST',
+    }),
+  dismissAlert: (alertId) =>
+    fetchWithHandle(`${API_BASE}/sentinel/dismiss-alert`, {
+      method: 'POST',
+      body: JSON.stringify({ alert_id: alertId }),
+    }),
+  updateScannerSettings: (payload) =>
+    fetchWithHandle(`${API_BASE}/sentinel/settings`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 };

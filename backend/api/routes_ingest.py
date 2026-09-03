@@ -48,10 +48,15 @@ async def upload_and_enrich_document(file: UploadFile = File(...)):
                 detail="Could not extract readable text content from the uploaded file."
             )
 
-        # Run Enrichment Agentic Loop
+        # ── Tier 0 On-Premise PII Sanitization for Knowledge Ingestion ──
+        from backend.governance.pii_perimeter import pii_engine
+        pii_result = pii_engine.sanitize_text(extracted_text)
+        sanitized_content = pii_result["sanitized_text"]
+
+        # Run Enrichment Agentic Loop on sanitized content
         result = enrichment_agent.evaluate_with_agentic_loop(
             filename=filename,
-            content=extracted_text,
+            content=sanitized_content,
             file_type=file_type,
         )
 
@@ -59,7 +64,11 @@ async def upload_and_enrich_document(file: UploadFile = File(...)):
             "success": True,
             "filename": filename,
             "file_type": file_type,
-            "content_preview": extracted_text[:300] + ("..." if len(extracted_text) > 300 else ""),
+            "content_preview": sanitized_content[:300] + ("..." if len(sanitized_content) > 300 else ""),
+            "pii_sanitization": {
+                "masked_count": pii_result["masked_count"],
+                "has_pii": pii_result["has_pii"],
+            },
             "result": result
         }
 

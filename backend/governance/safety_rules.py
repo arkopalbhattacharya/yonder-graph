@@ -158,7 +158,7 @@ GOVERNANCE_POLICY_HEADER = """
 """
 
 TIER1_DESCRIPTION = (
-    "Tier 1 (Cognitive Advisor): Google ADK GovernanceSafetyAgent evaluates "
+    "Tier 1 (Cognitive Advisor): GovernanceSafetyAgent evaluates "
     "operational risk, selects the appropriate remediation tier (MOCA → UI → "
     "Governed Patch → Dual-Control), and provides human-readable policy "
     "justifications for all safety restrictions."

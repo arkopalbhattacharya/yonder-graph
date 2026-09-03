@@ -21,6 +21,8 @@ from backend.api.routes_feedback import router as feedback_router
 from backend.api.routes_governance import router as governance_router
 from backend.api.routes_chat import router as chat_router
 from backend.api.routes_ingest import router as ingest_router
+from backend.api.routes_sentinel import router as sentinel_router
+from backend.api.routes_reports import router as reports_router
 from backend.database.retention import purge_expired_sessions
 
 # Configure logging
@@ -98,6 +100,8 @@ app.include_router(hitl_router, prefix="/api/hitl", tags=["HITL"])
 app.include_router(feedback_router, prefix="/api/feedback", tags=["Feedback"])
 app.include_router(governance_router, prefix="/api/governance", tags=["Governance"])
 app.include_router(ingest_router, prefix="/api/ingest", tags=["Ingest & Enrichment"])
+app.include_router(sentinel_router, prefix="/api/sentinel", tags=["Sentinel"])
+app.include_router(reports_router, prefix="/api", tags=["Reports & Executive ROI"])
 
 
 @app.get("/api/health", tags=["Health"])

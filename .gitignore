@@ -38,3 +38,10 @@ logs/
 # ── Knowledge staging artifacts ──
 knowledge/staging/pending_review/*.json
 knowledge/archive/
+
+# ── Local Model Weights & Cache ──
+backend/models/
+models/
+*.bin
+*.safetensors
+*.onnx

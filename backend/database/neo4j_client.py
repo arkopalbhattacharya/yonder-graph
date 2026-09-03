@@ -182,11 +182,11 @@ class Neo4jClient:
                 tbl = props.get("table_name", "")
                 name = f"{tbl}.{col}" if tbl and col else (col or "Column")
                 val = 4
-                color = "#0ea5e9"  # Sky Blue
+                color = "#ec4899"  # Pink (same as business term color)
             elif "SOPRunbook" in lbls:
                 name = props.get("sop_id") or props.get("issue_pattern") or "SOP"
                 val = 7
-                color = "#8b5cf6"  # Purple
+                color = "#eab308"  # Yellow
             elif "Domain" in lbls:
                 name = props.get("name") or "Domain"
                 val = 12
@@ -194,11 +194,11 @@ class Neo4jClient:
             elif "BusinessFlow" in lbls:
                 name = props.get("name") or props.get("flow_name") or "Flow"
                 val = 6
-                color = "#f59e0b"  # Amber
+                color = "#94a3b8"  # Slate Grey (Light)
             elif "BusinessTerm" in lbls:
                 name = props.get("term") or props.get("name") or "Term"
                 val = 5
-                color = "#ec4899"  # Pink
+                color = "#64748b"  # Slate Grey (Medium/Dark)
             elif "BYConfig" in lbls:
                 name = props.get("config_name") or props.get("name") or "Config"
                 val = 5

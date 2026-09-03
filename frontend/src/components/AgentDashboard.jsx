@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Activity, Clock, ShieldAlert, Zap, Server, Terminal, Cpu, CheckCircle, AlertTriangle, ArrowDownRight, ArrowUpRight, PowerOff } from 'lucide-react';
+import { Activity, Clock, ShieldAlert, Zap, Server, Terminal, Cpu, CheckCircle, AlertTriangle, ArrowDownRight, ArrowUpRight, PowerOff, Radar, Shield } from 'lucide-react';
 import { api } from '../services/api';
 import { useSettings } from '../context/SettingsContext';
 import AgentDetailModal from './AgentDetailModal';
@@ -9,7 +9,7 @@ export default function AgentDashboard({ isActive }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedAgent, setSelectedAgent] = useState(null);
-  const { enableAskMode } = useSettings();
+  const { enableAskMode, enableSentinel } = useSettings();
 
   const [sessionTokens, setSessionTokens] = useState(() => {
     try {
@@ -86,6 +86,9 @@ export default function AgentDashboard({ isActive }) {
     if (!enableAskMode && name === 'AskProcessAgent') {
       return false;
     }
+    if (!enableSentinel && name === 'SentinelScannerAgent') {
+      return false;
+    }
     return true;
   });
 
@@ -93,8 +96,15 @@ export default function AgentDashboard({ isActive }) {
     if (!enableAskMode && name === 'AskProcessAgent') {
       return true;
     }
+    if (!enableSentinel && name === 'SentinelScannerAgent') {
+      return true;
+    }
     return false;
   });
+
+  const sessionQueries = telemetry?.session_queries || 0;
+  const lifetimeQueries = telemetry?.total_queries || 0;
+  const activeSessionInvocations = Object.values(telemetry?.agents || {}).reduce((acc, ag) => acc + (ag.session_invocation_count || 0), 0);
 
   return (
     <div className="w-full h-full flex flex-col bg-surface-light dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 font-mono text-xs overflow-hidden relative">
@@ -107,7 +117,7 @@ export default function AgentDashboard({ isActive }) {
             <h2 className="text-sm font-bold tracking-tight">agent_telemetry</h2>
           </div>
           <p className="text-zinc-500 dark:text-zinc-400 text-[11px] mt-0.5">
-            Google ADK Multi-Agent Squad metrics, live tokens & telemetry traces
+            Multi-Agent Squad metrics, live tokens & telemetry traces
           </p>
         </div>
         <div className="flex items-center space-x-2 text-[11px] bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xs">
@@ -123,9 +133,9 @@ export default function AgentDashboard({ isActive }) {
           {/* Top Stat Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
             <StatCard 
-              title="invocations" 
-              value={(telemetry?.total_invocations || 0).toLocaleString()} 
-              subtext={`Active Agents: ${activeAgents.length}`}
+              title="queries / invocations" 
+              value={`${(lifetimeQueries || 0).toLocaleString()} / ${(telemetry?.total_invocations || 0).toLocaleString()}`} 
+              sessionBadge={`Session: ${(sessionQueries || 0).toLocaleString()} ${sessionQueries === 1 ? 'query' : 'queries'} (${(activeSessionInvocations || 0).toLocaleString()} calls)`}
               icon={Activity} 
               color="text-blue-500"
             />
@@ -142,7 +152,7 @@ export default function AgentDashboard({ isActive }) {
               subtext={`Lifetime In: ${(telemetry?.total_prompt_tokens || 0).toLocaleString()} • Out: ${(telemetry?.total_completion_tokens || 0).toLocaleString()}`}
               sessionBadge={`Session: ${(sessionTokens.total || 0).toLocaleString()} (${(sessionTokens.prompt || 0).toLocaleString()} in / ${(sessionTokens.completion || 0).toLocaleString()} out)`}
               icon={Zap} 
-              color="text-purple-500"
+              color="text-blue-500"
             />
             <StatCard 
               title="gov_intercepts" 
@@ -184,17 +194,30 @@ export default function AgentDashboard({ isActive }) {
               const totalPrompt = agentMetrics.prompt_tokens || 0;
               const totalCompletion = agentMetrics.completion_tokens || 0;
               const totalTokens = agentMetrics.total_tokens || 0;
+              const isSentinel = name === 'SentinelScannerAgent';
 
               return (
                 <div 
                   key={name} 
-                  className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111114] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors flex flex-col justify-between space-y-3"
+                  className={`p-4 rounded-xl border transition-all flex flex-col justify-between space-y-3 ${
+                    isSentinel
+                      ? 'border-rose-500/40 dark:border-rose-500/40 bg-gradient-to-b from-rose-500/5 via-white/80 to-white/80 dark:via-[#111114]/90 dark:to-[#111114]/90 shadow-xs hover:border-rose-500/70'
+                      : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111114] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700'
+                  }`}
                 >
                   <div>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center space-x-2">
-                        <div className="p-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                          <Terminal size={13} className="text-blue-500" />
+                        <div className={`p-1 rounded-md ${
+                          isSentinel
+                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                        }`}>
+                          {isSentinel ? (
+                            <Radar size={13} className="text-rose-500 animate-pulse" />
+                          ) : (
+                            <Terminal size={13} className="text-blue-500" />
+                          )}
                         </div>
                         {/* Glowing Health Indicator */}
                         <div className="relative flex items-center justify-center">
@@ -207,7 +230,18 @@ export default function AgentDashboard({ isActive }) {
                             title={isHealthy ? "100% Healthy" : `${errorRate}% Error Rate`}
                           />
                         </div>
-                        <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{name}</span>
+                        <span className={`text-xs font-bold ${
+                          isSentinel 
+                            ? 'text-rose-700 dark:text-rose-300 font-extrabold' 
+                            : 'text-zinc-900 dark:text-zinc-100'
+                        }`}>
+                          {name}
+                        </span>
+                        {isSentinel && (
+                          <span className="px-1.5 py-0.2 rounded text-[8px] font-extrabold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 uppercase">
+                            AUTONOMY
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center space-x-1.5">
                         {intercepts > 0 && (
@@ -217,7 +251,11 @@ export default function AgentDashboard({ isActive }) {
                           </span>
                         )}
                         {info.tier && info.tier !== 'none' && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            isSentinel
+                              ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
+                              : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
+                          }`}>
                             {info.tier}
                           </span>
                         )}
@@ -230,7 +268,11 @@ export default function AgentDashboard({ isActive }) {
                         {info.role}{" "}
                         <button 
                           onClick={() => setSelectedAgent({ name, info, metrics: agentMetrics })}
-                          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold underline underline-offset-2 ml-1 cursor-pointer transition-colors"
+                          className={`inline-flex items-center font-semibold underline underline-offset-2 ml-1 cursor-pointer transition-colors ${
+                            isSentinel 
+                              ? 'text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300'
+                              : 'text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'
+                          }`}
                         >
                           more
                         </button>
@@ -258,7 +300,7 @@ export default function AgentDashboard({ isActive }) {
                     <div>
                       <div className="flex items-center justify-between font-bold text-zinc-500 dark:text-zinc-400 mb-1">
                         <span className="uppercase tracking-wider">Session Tokens</span>
-                        <span className="text-purple-600 dark:text-purple-400 font-bold">{sessionTotal.toLocaleString()}</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-bold">{sessionTotal.toLocaleString()}</span>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
                         <div className="flex items-center space-x-1 text-zinc-600 dark:text-zinc-400">
@@ -310,7 +352,7 @@ export default function AgentDashboard({ isActive }) {
             })}
           </div>
 
-          {/* Disabled / Inactive Agents Section (When Ask Mode is Off) */}
+          {/* Disabled / Inactive Agents Section (When Ask Mode or Sentinel is Off) */}
           {disabledAgents.length > 0 && (
             <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
               <div className="flex items-center justify-between">
@@ -320,7 +362,7 @@ export default function AgentDashboard({ isActive }) {
                     Inactive Agents ({disabledAgents.length})
                   </span>
                   <span className="px-2 py-0.5 rounded-md text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border border-zinc-200 dark:border-zinc-700">
-                    Ask Mode Disabled
+                    Experimental Flag Disabled
                   </span>
                 </div>
               </div>
@@ -328,6 +370,7 @@ export default function AgentDashboard({ isActive }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-60 hover:opacity-100 transition-opacity">
                 {disabledAgents.map(([name, info]) => {
                   const agentMetrics = telemetry?.agents?.[name] || {};
+                  const isSentinel = name === 'SentinelScannerAgent';
                   return (
                     <div 
                       key={name}
@@ -336,13 +379,13 @@ export default function AgentDashboard({ isActive }) {
                       <div className="flex justify-between items-start">
                         <div className="flex items-center space-x-2">
                           <div className="p-1 rounded-md bg-zinc-200/60 dark:bg-zinc-800 text-zinc-500">
-                            <Terminal size={13} />
+                            {isSentinel ? <Radar size={13} /> : <Terminal size={13} />}
                           </div>
                           <span className="w-2.5 h-2.5 rounded-full bg-zinc-400 dark:bg-zinc-600" title="Disabled" />
                           <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{name}</span>
                         </div>
                         <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700">
-                          DISABLED
+                          {isSentinel ? 'SENTINEL OFF' : 'ASK MODE OFF'}
                         </span>
                       </div>
                       
@@ -397,7 +440,7 @@ function StatCard({ title, value, subtext, sessionBadge, icon: Icon, color = "te
       {(subtext || sessionBadge) && (
         <div className="space-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800/60 text-[10px]">
           {subtext && <div className="text-zinc-500 dark:text-zinc-400 truncate">{subtext}</div>}
-          {sessionBadge && <div className="text-purple-600 dark:text-purple-400 font-semibold">{sessionBadge}</div>}
+          {sessionBadge && <div className="text-blue-600 dark:text-blue-400 font-semibold">{sessionBadge}</div>}
         </div>
       )}
     </div>

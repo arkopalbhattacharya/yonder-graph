@@ -1,5 +1,5 @@
 """
-Yonder Graph — Google ADK Tool Definitions
+Yonder Graph — Multi-Agent Tool Definitions
 
 Defines the function tools available to the multi-agent inference engine.
 These tools bridge the agents to Neo4j, the governance layer, the audit

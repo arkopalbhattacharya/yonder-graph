@@ -7,6 +7,7 @@ export default {
       fontFamily: {
         sans: ['JetBrains Mono', 'Fira Code', 'SF Mono', 'monospace'],
         mono: ['JetBrains Mono', 'Fira Code', 'SF Mono', 'monospace'],
+        serif: ['Newsreader', 'Playfair Display', 'Lora', 'Georgia', 'Cambria', 'serif'],
       },
       colors: {
         surface: {

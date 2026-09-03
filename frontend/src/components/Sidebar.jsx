@@ -13,7 +13,14 @@ import {
   ExternalLink,
   ShieldCheck,
   ChevronUp,
-  FlaskConical
+  FlaskConical,
+  Radar,
+  Info,
+  ShieldAlert,
+  AlertTriangle,
+  X,
+  Zap,
+  Lock
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useSettings } from '../context/SettingsContext';
@@ -32,10 +39,22 @@ export default function Sidebar({
   onDeleteSession 
 }) {
   const { isDarkMode, toggleTheme } = useTheme();
-  const { enableAskMode, toggleAskMode, enableFileUpload, toggleFileUpload, enableShowReasoning, toggleShowReasoning } = useSettings();
+  const { 
+    enableAskMode = false, 
+    toggleAskMode = () => {}, 
+    enableFileUpload = false, 
+    toggleFileUpload = () => {}, 
+    enableShowReasoning = false, 
+    toggleShowReasoning = () => {}, 
+    enableSentinel = false, 
+    toggleSentinel = () => {},
+    enableChatFollowup = false,
+    toggleChatFollowup = () => {},
+  } = useSettings() || {};
   const [health, setHealth] = useState(null);
   const [pendingReviews, setPendingReviews] = useState([]);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isSentinelInfoOpen, setIsSentinelInfoOpen] = useState(false);
   const userMenuRef = useRef(null);
 
   // Check health and pending human reviews
@@ -43,18 +62,18 @@ export default function Sidebar({
     try {
       const [healthData, reviewsData] = await Promise.all([
         api.checkHealth().catch(() => ({ status: 'error' })),
-        api.getPendingReviews().catch(() => ({ pending_reviews: [] }))
+        api.getPendingReviews().catch(() => []),
       ]);
       setHealth(healthData);
-      setPendingReviews(reviewsData?.pending_reviews || []);
-    } catch (e) {
-      console.warn("Status fetch failed", e);
+      setPendingReviews(reviewsData || []);
+    } catch (err) {
+      console.warn("Status fetch failed:", err);
     }
   };
 
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 10000);
+    const interval = setInterval(fetchStatus, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -76,10 +95,11 @@ export default function Sidebar({
     { id: 'agents', label: 'agents' },
     { id: 'studio', label: 'studio' },
     { id: 'governance', label: 'governance' },
+    { id: 'metrics', label: 'metrics' },
   ];
 
-  const pinnedSessions = sessions.filter(s => s.is_pinned);
-  const recentSessions = sessions.filter(s => !s.is_pinned);
+  const pinnedSessions = sessions.filter(s => s.is_pinned).slice(0, 5);
+  const recentSessions = sessions.filter(s => !s.is_pinned).slice(0, 5);
   const pendingCount = pendingReviews.length;
 
   const handleNavigateToReview = () => {
@@ -100,7 +120,7 @@ export default function Sidebar({
             yg
           </div>
           <div>
-            <div className="font-extrabold text-sm sm:text-[15px] text-zinc-900 dark:text-zinc-100 tracking-tight leading-none">
+            <div className="font-mono font-extrabold text-sm sm:text-[15px] text-zinc-900 dark:text-zinc-100 tracking-tight leading-none">
               yonder_graph
             </div>
             <div className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium mt-0.5">
@@ -178,8 +198,55 @@ export default function Sidebar({
           </div>
         </div>
 
-        {/* ── Navigation Links (under Recent, header removed, ask/resolve removed) ── */}
-        <div className="pt-2.5 border-t border-zinc-200/60 dark:border-zinc-800/60">
+        {/* ── AUTONOMY Section (Highlighted Sentinel in Red Accent - Experimental) ── */}
+        {enableSentinel && (
+          <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60">
+            <div className="px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+              <div className="flex items-center space-x-1.5">
+                <Radar size={11} className="animate-pulse text-rose-500" />
+                <span>AUTONOMY</span>
+              </div>
+              <span className="px-1.5 py-0.2 rounded text-[8.5px] font-extrabold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                ALPHA
+              </span>
+            </div>
+
+            <div className="mt-1 group relative">
+              <div
+                onClick={() => setActiveTab('sentinel')}
+                className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-all font-mono text-xs cursor-pointer border ${
+                  activeTab === 'sentinel'
+                    ? 'bg-gradient-to-r from-rose-500/15 via-red-500/10 to-rose-500/15 border-rose-500/50 text-rose-950 dark:text-rose-200 font-bold shadow-xs'
+                    : 'border-rose-500/20 bg-rose-50/40 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300 hover:bg-rose-100/60 dark:hover:bg-rose-900/40 hover:border-rose-500/40'
+                }`}
+              >
+                <div className="flex items-center space-x-2 truncate">
+                  <span className="flex h-2 w-2 relative flex-shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                  </span>
+                  <span className="font-extrabold tracking-tight">SENTINEL</span>
+                </div>
+
+                {/* Hover Info Icon */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsSentinelInfoOpen(true);
+                  }}
+                  className="p-1 rounded-md hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 opacity-60 hover:opacity-100 transition-all cursor-pointer flex-shrink-0"
+                  title="Sentinel IT Details & Cautionary Briefing"
+                >
+                  <Info size={13} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Navigation Links (under Autonomy) ── */}
+        <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60">
           <div className="space-y-0.5">
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
@@ -189,7 +256,7 @@ export default function Sidebar({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-left transition-all font-mono text-xs ${
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-left transition-all font-mono text-xs cursor-pointer ${
                     isActive
                       ? 'bg-zinc-200/80 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 font-semibold shadow-2xs'
                       : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -397,6 +464,56 @@ export default function Sidebar({
                   <span className="w-3.5 h-3.5 rounded-full bg-white shadow-xs block" />
                 </button>
               </div>
+
+              {/* Sentinel Toggle */}
+              <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
+                <div className="pr-2 min-w-0">
+                  <div className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 flex items-center space-x-1">
+                    <span>Sentinel</span>
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 font-bold border border-rose-200 dark:border-rose-800">
+                      ALPHA
+                    </span>
+                  </div>
+                  <div className="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 leading-tight">
+                    Autonomous 24/7 proactive WMS health scanner
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleSentinel}
+                  className={`w-8 h-4.5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
+                    enableSentinel ? 'bg-rose-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
+                  }`}
+                  title={enableSentinel ? "Disable Sentinel" : "Enable Sentinel"}
+                >
+                  <span className="w-3.5 h-3.5 rounded-full bg-white shadow-xs block" />
+                </button>
+              </div>
+
+              {/* Chat Follow-ups Toggle */}
+              <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
+                <div className="pr-2 min-w-0">
+                  <div className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 flex items-center space-x-1">
+                    <span>Chat Follow-ups</span>
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 font-bold border border-purple-200 dark:border-purple-800">
+                      BETA
+                    </span>
+                  </div>
+                  <div className="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 leading-tight">
+                    Multi-turn follow-up queries with session context management
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleChatFollowup}
+                  className={`w-8 h-4.5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
+                    enableChatFollowup ? 'bg-blue-600 justify-end' : 'bg-zinc-300 dark:bg-zinc-700 justify-start'
+                  }`}
+                  title={enableChatFollowup ? "Disable Chat Follow-ups" : "Enable Chat Follow-ups"}
+                >
+                  <span className="w-3.5 h-3.5 rounded-full bg-white shadow-xs block" />
+                </button>
+              </div>
             </div>
 
             {/* Theme Toggle Button */}
@@ -444,6 +561,127 @@ export default function Sidebar({
           </div>
         )}
       </div>
+
+      {/* ── Sentinel IT Architecture & Cautionary Modal ── */}
+      {isSentinelInfoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-mono">
+          <div className="w-full max-w-xl max-h-[85vh] overflow-y-auto bg-white dark:bg-[#111114] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4 custom-scrollbar">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800/80">
+              <div className="flex items-center space-x-2.5">
+                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                  <Radar size={18} className="animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
+                    Predictive Sentinel Engine
+                  </h3>
+                  <div className="text-[10px] text-zinc-400 font-medium">
+                    IT Architecture, Sweep Mechanics & Operational Caution
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsSentinelInfoOpen(false)}
+                className="p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* 1. What It Is */}
+            <div className="space-y-1.5">
+              <div className="flex items-center space-x-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                <Zap size={13} className="text-indigo-500" />
+                <span>1. What It Is</span>
+              </div>
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-300 leading-relaxed bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60">
+                The Sentinel is an <strong>autonomous, 24/7 background diagnostic daemon</strong> (the 10th agent in the squad). Instead of waiting for warehouse floor pickers or support engineers to report stalled orders, Sentinel continuously sweeps connected Oracle WMS tables to detect operational bottlenecks in real time.
+              </p>
+            </div>
+
+            {/* 2. What It Does */}
+            <div className="space-y-1.5">
+              <div className="flex items-center space-x-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                <ShieldCheck size={13} className="text-emerald-500" />
+                <span>2. What It Does</span>
+              </div>
+              <ul className="text-[11px] text-zinc-600 dark:text-zinc-300 space-y-1.5 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60">
+                <li className="flex items-start space-x-1.5">
+                  <span className="text-blue-500 font-bold">•</span>
+                  <span><strong>Outbound Waves:</strong> Detects allocation shortfalls in <code className="text-zinc-800 dark:text-zinc-200 font-bold">PCKWAV</code> & <code className="text-zinc-800 dark:text-zinc-200 font-bold">ORD_LINE</code> before pickers stall.</span>
+                </li>
+                <li className="flex items-start space-x-1.5">
+                  <span className="text-emerald-500 font-bold">•</span>
+                  <span><strong>Inbound Docks:</strong> Flags stagnant trailers checked into <code className="text-zinc-800 dark:text-zinc-200 font-bold">RCVTRK</code> for &gt;4h without active receiving lines.</span>
+                </li>
+                <li className="flex items-start space-x-1.5">
+                  <span className="text-purple-500 font-bold">•</span>
+                  <span><strong>Inventory Holds:</strong> Identifies high-velocity SKUs locked on hold in <code className="text-zinc-800 dark:text-zinc-200 font-bold">INVDTL</code> blocking active demand.</span>
+                </li>
+                <li className="flex items-start space-x-1.5">
+                  <span className="text-indigo-500 font-bold">•</span>
+                  <span><strong>Autonomous Pre-Triage:</strong> Upon anomaly detection, automatically runs the 7-agent squad in background to generate complete L1/L2/L3 investigation steps in 1.2s.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* 3. Why It Should Be Used With Caution */}
+            <div className="space-y-1.5">
+              <div className="flex items-center space-x-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
+                <AlertTriangle size={13} />
+                <span>3. Operational Caution & IT Advisory</span>
+              </div>
+              <div className="text-[11px] text-amber-900 dark:text-amber-300/90 leading-relaxed bg-amber-50/60 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-500/30 space-y-1.5">
+                <p>
+                  <strong>• Live Database Queries:</strong> Continuous background sweeps execute read queries against your Oracle WMS host at the configured interval (e.g. every 60s).
+                </p>
+                <p>
+                  <strong>• Recommended Target:</strong> Always point Sentinel to an <strong>Oracle Active Data Guard Read Replica</strong> or a <strong>Dedicated Dev/Test Instance</strong>. Avoid pointing sweeps to primary master OLTP nodes under heavy peak warehouse shifts without DBA query index reviews.
+                </p>
+                <p>
+                  <strong>• Human-in-the-Loop (HITL):</strong> While Sentinel diagnostic reads are 100% automated and safe, elevated remediation fixes (Tier 3/4 MOCA state adjustments) must still be reviewed by human engineers.
+                </p>
+              </div>
+            </div>
+
+            {/* 4. Zero-Mutation Guarantee */}
+            <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/10 text-emerald-900 dark:text-emerald-300 text-[10.5px] space-y-1">
+              <div className="flex items-center space-x-1.5 font-bold">
+                <Lock size={12} className="text-emerald-600 dark:text-emerald-400" />
+                <span>Zero-Mutation Guarantee</span>
+              </div>
+              <p className="text-emerald-800 dark:text-emerald-400/90">
+                Protected by 4-layer defense in depth: Pre-execution AST validation, session-level <code className="bg-emerald-500/20 px-1 py-0.2 rounded">SET TRANSACTION READ ONLY</code>, and strict DB role <code className="font-bold">GRANT SELECT</code> air gap. All write operations are impossible.
+              </p>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end space-x-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+              <button
+                onClick={() => setIsSentinelInfoOpen(false)}
+                className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Close
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsSentinelInfoOpen(false);
+                  setActiveTab('sentinel');
+                }}
+                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+              >
+                <Radar size={13} />
+                <span>Open Sentinel View</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

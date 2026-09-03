@@ -191,14 +191,78 @@ export default function GraphVisualizer({ isActive }) {
     const colors = {
       Domain: '#10b981',       // Emerald
       Table: '#3b82f6',        // Blue
-      Column: '#0ea5e9',       // Sky Blue
-      SOPRunbook: '#8b5cf6',   // Purple
-      BusinessFlow: '#f59e0b', // Amber
-      BusinessTerm: '#ec4899', // Pink
+      Column: '#ec4899',       // Pink (same as previous business term color)
+      SOPRunbook: '#eab308',   // Yellow
+      BusinessFlow: '#94a3b8', // Slate Grey (Light)
+      BusinessTerm: '#64748b', // Slate Grey (Medium/Dark)
       BYConfig: '#ef4444'      // Red
     };
     return colors[node.label] || '#64748b';
   };
+
+  // ── Calculate Focus & Fade-out Sets for Node Selection or Search ──
+  const { highlightNodes, highlightLinks, isFocusActive } = useMemo(() => {
+    const hasSearch = Boolean(searchQuery && searchQuery.trim().length > 0);
+    const hasSelection = Boolean(selectedNode);
+
+    if (!hasSearch && !hasSelection) {
+      return {
+        highlightNodes: new Set(),
+        highlightLinks: new Set(),
+        isFocusActive: false
+      };
+    }
+
+    const hNodes = new Set();
+    const hLinks = new Set();
+
+    // 1. If a node is selected, highlight it and its direct neighbors & links
+    if (hasSelection) {
+      hNodes.add(selectedNode.id);
+      filteredGraphData.links.forEach(link => {
+        const srcId = typeof link.source === 'object' ? link.source.id : link.source;
+        const tgtId = typeof link.target === 'object' ? link.target.id : link.target;
+        if (srcId === selectedNode.id || tgtId === selectedNode.id) {
+          hLinks.add(link);
+          hNodes.add(srcId);
+          hNodes.add(tgtId);
+        }
+      });
+    }
+
+    // 2. If search query is active
+    if (hasSearch) {
+      const q = searchQuery.trim().toLowerCase();
+      const directMatches = new Set();
+
+      filteredGraphData.nodes.forEach(n => {
+        const name = (n.name || '').toLowerCase();
+        const label = (n.label || '').toLowerCase();
+        const domain = (n.domain || n.props?.domain || '').toLowerCase();
+        const purpose = (n.props?.business_purpose || n.props?.description || '').toLowerCase();
+        if (name.includes(q) || label.includes(q) || domain.includes(q) || purpose.includes(q)) {
+          directMatches.add(n.id);
+          hNodes.add(n.id);
+        }
+      });
+
+      filteredGraphData.links.forEach(link => {
+        const srcId = typeof link.source === 'object' ? link.source.id : link.source;
+        const tgtId = typeof link.target === 'object' ? link.target.id : link.target;
+        if (directMatches.has(srcId) || directMatches.has(tgtId)) {
+          hLinks.add(link);
+          hNodes.add(srcId);
+          hNodes.add(tgtId);
+        }
+      });
+    }
+
+    return {
+      highlightNodes: hNodes,
+      highlightLinks: hLinks,
+      isFocusActive: true
+    };
+  }, [filteredGraphData, selectedNode, searchQuery]);
 
   // ── 5. Zoom-Adaptive Canvas Node Rendering ───────────────────────
   const renderNode = useCallback((node, ctx, globalScale) => {
@@ -210,6 +274,12 @@ export default function GraphVisualizer({ isActive }) {
 
     const isMatch = searchQuery && label.toLowerCase().includes(searchQuery.toLowerCase());
     const isSelected = selectedNode && selectedNode.id === node.id;
+    const isHighlighted = !isFocusActive || highlightNodes.has(node.id);
+
+    ctx.save();
+    if (isFocusActive) {
+      ctx.globalAlpha = isHighlighted ? 1.0 : 0.10;
+    }
 
     // Draw Outer Glow / Highlight Ring
     if (isSelected || isMatch) {
@@ -262,7 +332,9 @@ export default function GraphVisualizer({ isActive }) {
       ? (isDarkMode ? '#60a5fa' : '#2563eb') 
       : (isDarkMode ? '#fafafa' : '#111827');
     ctx.fillText(label, node.x, boxY + boxH / 2);
-  }, [isDarkMode, searchQuery, selectedNode]);
+
+    ctx.restore();
+  }, [isDarkMode, searchQuery, selectedNode, isFocusActive, highlightNodes]);
 
   // ── 6. Render Relationship Names along Link Lines ───────────────
   const renderLink = useCallback((link, ctx, globalScale) => {
@@ -274,6 +346,13 @@ export default function GraphVisualizer({ isActive }) {
     const end = link.target;
     if (!start || !end || start.x === undefined || end.x === undefined) return;
 
+    const isHighlighted = !isFocusActive || highlightLinks.has(link);
+
+    ctx.save();
+    if (isFocusActive) {
+      ctx.globalAlpha = isHighlighted ? 1.0 : 0.05;
+    }
+
     const midX = (start.x + end.x) / 2;
     const midY = (start.y + end.y) / 2;
     const fontSize = Math.max(7 / globalScale, 2);
@@ -281,9 +360,13 @@ export default function GraphVisualizer({ isActive }) {
     ctx.font = `italic 500 ${fontSize}px ui-monospace, monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = isDarkMode ? 'rgba(212, 212, 216, 0.7)' : 'rgba(75, 85, 99, 0.8)';
+    ctx.fillStyle = isHighlighted
+      ? (isDarkMode ? 'rgba(212, 212, 216, 0.85)' : 'rgba(55, 65, 81, 0.95)')
+      : (isDarkMode ? 'rgba(212, 212, 216, 0.15)' : 'rgba(75, 85, 99, 0.15)');
     ctx.fillText(label, midX, midY - (2 / globalScale));
-  }, [isDarkMode]);
+
+    ctx.restore();
+  }, [isDarkMode, isFocusActive, highlightLinks]);
 
   // ── 7. Calculate Factual Node Hierarchy & Related Neighbors ─────
   const nodeHierarchy = useMemo(() => {
@@ -698,13 +781,13 @@ export default function GraphVisualizer({ isActive }) {
 
               {nodeHierarchy?.referencedSops?.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="text-[10px] uppercase font-bold text-purple-600 dark:text-purple-400 tracking-wider">Registered SOP Runbooks ({nodeHierarchy.referencedSops.length})</span>
+                  <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 tracking-wider">Registered SOP Runbooks ({nodeHierarchy.referencedSops.length})</span>
                   <div className="flex flex-wrap gap-1 max-h-36 overflow-y-auto custom-scrollbar">
                     {nodeHierarchy.referencedSops.map(sop => (
                       <span 
                         key={sop.id} 
                         onClick={() => handleFocusNode(sop)}
-                        className="px-2 py-1 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 font-bold text-[10px] cursor-pointer hover:bg-purple-100 transition-colors"
+                        className="px-2 py-1 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 font-bold text-[10px] cursor-pointer hover:bg-amber-100 transition-colors"
                       >
                         {sop.name}
                       </span>
@@ -728,10 +811,10 @@ export default function GraphVisualizer({ isActive }) {
             {[
               { label: 'Domain', color: '#10b981' },
               { label: 'Table', color: '#3b82f6' },
-              { label: 'Column', color: '#0ea5e9' },
-              { label: 'SOP Runbook', color: '#8b5cf6' },
-              { label: 'Business Flow', color: '#f59e0b' },
-              { label: 'Business Term', color: '#ec4899' },
+              { label: 'Column', color: '#ec4899' },
+              { label: 'SOP Runbook', color: '#eab308' },
+              { label: 'Business Flow', color: '#94a3b8' },
+              { label: 'Business Term', color: '#64748b' },
             ].map(item => (
               <div key={item.label} className="flex items-center space-x-1.5">
                 <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
@@ -762,9 +845,27 @@ export default function GraphVisualizer({ isActive }) {
               nodeColor={getNodeColor}
               nodeRelSize={2}
               onNodeClick={(node) => handleFocusNode(node)}
-              linkColor={() => isDarkMode ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.16)'}
-              linkDirectionalParticles={1}
-              linkDirectionalParticleWidth={1.2}
+              onBackgroundClick={() => setSelectedNode(null)}
+              linkColor={(link) => {
+                if (!isFocusActive) {
+                  return isDarkMode ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.16)';
+                }
+                return highlightLinks.has(link)
+                  ? (isDarkMode ? 'rgba(96, 165, 250, 0.85)' : 'rgba(37, 99, 235, 0.85)')
+                  : (isDarkMode ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.025)');
+              }}
+              linkWidth={(link) => {
+                if (!isFocusActive) return 1;
+                return highlightLinks.has(link) ? 2.4 : 0.4;
+              }}
+              linkDirectionalParticles={(link) => {
+                if (!isFocusActive) return 1;
+                return highlightLinks.has(link) ? 3 : 0;
+              }}
+              linkDirectionalParticleWidth={(link) => {
+                if (!isFocusActive) return 1.2;
+                return highlightLinks.has(link) ? 2.2 : 0;
+              }}
               linkDirectionalArrowLength={3.5}
               linkDirectionalArrowRelPos={0.88}
               nodeCanvasObject={renderNode}

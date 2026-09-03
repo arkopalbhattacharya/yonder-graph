@@ -156,23 +156,57 @@ def record_chat_turn(
 
     db.commit()
     db.refresh(session)
+    enforce_session_limits(db)
     return session
 
 
 # ── Route Handlers ───────────────────────────────────────────────
 
+def enforce_session_limits(db: Session) -> None:
+    """
+    Enforces that only the last 5 unpinned sessions are maintained in the database.
+    Older unpinned sessions are purged so that deleting a recent session does not
+    pull in older ghost histories. Pinned sessions are excluded from this purge.
+    """
+    unpinned_sessions = (
+        db.query(ChatSession)
+        .filter(ChatSession.is_pinned == False)
+        .order_by(desc(ChatSession.updated_at))
+        .all()
+    )
+    if len(unpinned_sessions) > 5:
+        excess_sessions = unpinned_sessions[5:]
+        for s in excess_sessions:
+            db.delete(s)
+        db.commit()
+
+
 @router.get("/sessions", response_model=List[ChatSessionSummary])
 def list_chat_sessions(db: Session = Depends(get_db)):
     """
-    Get 5 most recent chat histories in PostgreSQL (with pinned chats prioritized).
+    Get up to 5 pinned sessions and exactly up to 5 most recent unpinned sessions.
+    Auto-purges excess older unpinned sessions.
     """
-    sessions = (
+    enforce_session_limits(db)
+
+    pinned_sessions = (
         db.query(ChatSession)
-        .order_by(desc(ChatSession.is_pinned), desc(ChatSession.updated_at))
+        .filter(ChatSession.is_pinned == True)
+        .order_by(desc(ChatSession.updated_at))
         .limit(5)
         .all()
     )
-    return [s.to_dict() for s in sessions]
+
+    recent_sessions = (
+        db.query(ChatSession)
+        .filter(ChatSession.is_pinned == False)
+        .order_by(desc(ChatSession.updated_at))
+        .limit(5)
+        .all()
+    )
+
+    all_sessions = pinned_sessions + recent_sessions
+    return [s.to_dict() for s in all_sessions]
 
 
 @router.post("/sessions", response_model=ChatSessionSummary, status_code=status.HTTP_201_CREATED)
@@ -194,6 +228,7 @@ def create_chat_session(req: CreateSessionRequest, db: Session = Depends(get_db)
     db.add(new_session)
     db.commit()
     db.refresh(new_session)
+    enforce_session_limits(db)
     return new_session.to_dict()
 
 
@@ -225,7 +260,7 @@ def get_chat_session_detail(session_id: str, db: Session = Depends(get_db)):
 @router.patch("/sessions/{session_id}/pin", response_model=ChatSessionSummary)
 def toggle_pin_session(session_id: str, req: PinSessionRequest, db: Session = Depends(get_db)):
     """
-    Pin or unpin a chat session. Pinned sessions are excluded from 7-day retention purge.
+    Pin or unpin a chat session. Max 5 pinned sessions allowed.
     """
     session = db.query(ChatSession).filter(ChatSession.session_id == session_id).first()
     if not session:
@@ -234,9 +269,18 @@ def toggle_pin_session(session_id: str, req: PinSessionRequest, db: Session = De
             detail=f"Chat session '{session_id}' not found",
         )
 
+    if req.is_pinned and not session.is_pinned:
+        pinned_count = db.query(ChatSession).filter(ChatSession.is_pinned == True).count()
+        if pinned_count >= 5:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Maximum of 5 pinned sessions reached. Please unpin a session first.",
+            )
+
     session.is_pinned = req.is_pinned
     db.commit()
     db.refresh(session)
+    enforce_session_limits(db)
     return session.to_dict()
 
 

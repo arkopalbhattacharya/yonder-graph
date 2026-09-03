@@ -271,3 +271,124 @@ class ChatMessage(Base):
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 
+
+class ExecutiveRoiMetric(Base):
+    """
+    Persisted telemetry of executive cost savings, MTTR acceleration,
+    and SLA risk avoidance per incident triage for temporal reporting (day, month, year).
+    """
+
+    __tablename__ = "executive_roi_metrics"
+
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        nullable=False,
+    )
+    timestamp = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+        index=True,
+    )
+    year = Column(Integer, nullable=False, index=True)
+    month = Column(Integer, nullable=False, index=True)
+    day = Column(Integer, nullable=False, index=True)
+    session_id = Column(String(64), nullable=False, index=True)
+    domain = Column(String(64), nullable=False, default="general", index=True)
+    matched_sop_id = Column(String(64), nullable=True, index=True)
+    issue_pattern = Column(String(255), nullable=True)
+    root_cause_summary = Column(String(255), nullable=True)
+    manual_mttr_sec = Column(Float, nullable=False, default=2700.0)  # 45 minutes
+    automated_mttr_sec = Column(Float, nullable=False, default=1.8)
+    mttr_reduction_pct = Column(Float, nullable=False, default=96.0)
+    engineering_cost_saved_usd = Column(Float, nullable=False, default=120.0)
+    carrier_sla_penalty_avoided_usd = Column(Float, nullable=False, default=2500.0)
+    total_estimated_roi_usd = Column(Float, nullable=False, default=2620.0)
+    details = Column(JSONB, nullable=True)
+
+    __table_args__ = (
+        Index("idx_roi_year_month_day", "year", "month", "day"),
+        Index("idx_roi_domain_date", "domain", "year", "month"),
+        Index("idx_roi_session", "session_id"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<ExecutiveRoiMetric(id={self.id}, session={self.session_id}, roi=${self.total_estimated_roi_usd}, date={self.year}-{self.month}-{self.day})>"
+
+    def to_dict(self) -> dict:
+        return {
+            "id": str(self.id),
+            "timestamp": self.timestamp.isoformat() if self.timestamp else None,
+            "year": self.year,
+            "month": self.month,
+            "day": self.day,
+            "session_id": self.session_id,
+            "domain": self.domain,
+            "matched_sop_id": self.matched_sop_id,
+            "issue_pattern": self.issue_pattern,
+            "root_cause_summary": self.root_cause_summary,
+            "manual_mttr_sec": self.manual_mttr_sec,
+            "automated_mttr_sec": self.automated_mttr_sec,
+            "mttr_reduction_pct": self.mttr_reduction_pct,
+            "engineering_cost_saved_usd": self.engineering_cost_saved_usd,
+            "carrier_sla_penalty_avoided_usd": self.carrier_sla_penalty_avoided_usd,
+            "total_estimated_roi_usd": self.total_estimated_roi_usd,
+            "details": self.details,
+        }
+
+
+def record_roi_metric(
+    session_id: str,
+    domain: str,
+    matched_sop_id: str = None,
+    issue_pattern: str = None,
+    root_cause_summary: str = None,
+    manual_mttr_min: float = 45.0,
+    automated_mttr_sec: float = 1.8,
+    engineering_cost_saved: float = 120.0,
+    carrier_sla_penalty_avoided: float = 2500.0,
+    details: dict = None,
+    db = None,
+) -> ExecutiveRoiMetric:
+    """Record an incident triage ROI metric into PostgreSQL."""
+    now = datetime.now(timezone.utc)
+    manual_mttr_sec = manual_mttr_min * 60.0
+    mttr_reduction_pct = round(((manual_mttr_sec - automated_mttr_sec) / manual_mttr_sec) * 100.0, 1)
+    total_roi = round(engineering_cost_saved + carrier_sla_penalty_avoided, 2)
+
+    metric = ExecutiveRoiMetric(
+        timestamp=now,
+        year=now.year,
+        month=now.month,
+        day=now.day,
+        session_id=session_id,
+        domain=domain or "general",
+        matched_sop_id=matched_sop_id,
+        issue_pattern=issue_pattern,
+        root_cause_summary=root_cause_summary,
+        manual_mttr_sec=manual_mttr_sec,
+        automated_mttr_sec=automated_mttr_sec,
+        mttr_reduction_pct=mttr_reduction_pct,
+        engineering_cost_saved_usd=engineering_cost_saved,
+        carrier_sla_penalty_avoided_usd=carrier_sla_penalty_avoided,
+        total_estimated_roi_usd=total_roi,
+        details=details or {},
+    )
+
+    if db is not None:
+        db.add(metric)
+        db.commit()
+        db.refresh(metric)
+        db.expunge(metric)
+    else:
+        from backend.database.postgres_client import get_db_context
+        with get_db_context() as session:
+            session.add(metric)
+            session.commit()
+            session.refresh(metric)
+            session.expunge(metric)
+
+    return metric
+
